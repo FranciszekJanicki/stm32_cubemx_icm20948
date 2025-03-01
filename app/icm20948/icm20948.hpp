@@ -14,10 +14,11 @@ namespace ICM20948 {
     struct ICM20948 {
     public:
         using I2CDevice = Utility::I2CDevice;
+        using AK09916 = AK09916::AK09916;
 
         ICM20948() noexcept = default;
 
-        ICM20948(I2CDevice&& i2c_device) noexcept;
+        ICM20948(I2CDevice&& i2c_device, AK09916&& magnetometer) noexcept;
 
         ICM20948(ICM20948 const& other) = delete;
         ICM20948(ICM20948&& other) noexcept = default;
@@ -27,9 +28,34 @@ namespace ICM20948 {
 
         ~ICM20948() noexcept;
 
+        std::optional<float> get_acceleration_x_scaled() const noexcept;
+        std::optional<float> get_acceleration_y_scaled() const noexcept;
+        std::optional<float> get_acceleration_z_scaled() const noexcept;
+        std::optional<Vec3D<float>> get_acceleration_scaled() const noexcept;
+
+        std::optional<float> get_rotation_x_scaled() const noexcept;
+        std::optional<float> get_rotation_y_scaled() const noexcept;
+        std::optional<float> get_rotation_z_scaled() const noexcept;
+        std::optional<Vec3D<float>> get_rotation_scaled() const noexcept;
+
+        std::optional<float> get_magnetic_field_x_scaled() const noexcept;
+        std::optional<float> get_magnetic_field_y_scaled() const noexcept;
+        std::optional<float> get_magnetic_field_z_scaled() const noexcept;
+        std::optional<Vec3D<float>> get_magnetic_field_scaled() const noexcept;
+
     private:
         void initialize() noexcept;
         void deinitialize() noexcept;
+
+        std::optional<std::int16_t> get_acceleration_x_raw() const noexcept;
+        std::optional<std::int16_t> get_acceleration_y_raw() const noexcept;
+        std::optional<std::int16_t> get_acceleration_z_raw() const noexcept;
+        std::optional<Vec3D<std::int16_t>> get_acceleration_raw() const noexcept;
+
+        std::optional<std::int16_t> get_rotation_x_raw() const noexcept;
+        std::optional<std::int16_t> get_rotation_y_raw() const noexcept;
+        std::optional<std::int16_t> get_rotation_z_raw() const noexcept;
+        std::optional<Vec3D<std::int16_t>> get_rotation_raw() const noexcept;
 
         std::uint8_t read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept;
 
@@ -243,7 +269,12 @@ namespace ICM20948 {
 
         bool initialized_{false};
 
+        float accel_scale_{};
+        float gyro_scale_{};
+
         I2CDevice i2c_device_{};
+
+        AK09916 magnetometer_{};
     };
 
     template <std::size_t SIZE>

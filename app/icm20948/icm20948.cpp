@@ -4,7 +4,8 @@
 
 namespace ICM20948 {
 
-    ICM20948::ICM20948(I2CDevice&& i2c_device) noexcept : i2c_device_{std::forward<I2CDevice>(i2c_device)}
+    ICM20948::ICM20948(I2CDevice&& i2c_device, AK09916&& magnetometer) noexcept :
+        i2c_device_{std::forward<I2CDevice>(i2c_device)}, magnetometer_{std::forward<AK09916>(magnetometer)}
     {
         this->initialize();
     }
@@ -14,11 +15,142 @@ namespace ICM20948 {
         this->deinitialize();
     }
 
+    std::optional<float> ICM20948::get_acceleration_x_scaled() const noexcept
+    {
+        return this->get_acceleration_x_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->accel_scale_; });
+    }
+
+    std::optional<float> ICM20948::get_acceleration_y_scaled() const noexcept
+    {
+        return this->get_acceleration_y_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->accel_scale_; });
+    }
+
+    std::optional<float> ICM20948::get_acceleration_z_scaled() const noexcept
+    {
+        return this->get_acceleration_z_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->accel_scale_; });
+    }
+
+    std::optional<Vec3D<float>> ICM20948::get_acceleration_scaled() const noexcept
+    {
+        return this->get_acceleration_raw().transform(
+            [this](Vec3D<std::int16_t> const raw) { return static_cast<Vec3D<float>>(raw) / this->accel_scale_; });
+    }
+
+    std::optional<float> ICM20948::get_rotation_x_scaled() const noexcept
+    {
+        return this->get_rotation_x_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->gyro_scale_; });
+    }
+
+    std::optional<float> ICM20948::get_rotation_y_scaled() const noexcept
+    {
+        return this->get_rotation_y_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->gyro_scale_; });
+    }
+
+    std::optional<float> ICM20948::get_rotation_z_scaled() const noexcept
+    {
+        return this->get_rotation_z_raw().transform(
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->gyro_scale_; });
+    }
+
+    std::optional<Vec3D<float>> ICM20948::get_rotation_scaled() const noexcept
+    {
+        return this->get_rotation_raw().transform(
+            [this](Vec3D<std::int16_t> const raw) { return static_cast<Vec3D<float>>(raw) / this->gyro_scale_; });
+    }
+
+    std::optional<float> ICM20948::get_magnetic_field_x_scaled() const noexcept
+    {
+        return this->magnetometer_.get_magnetic_field_x_scaled();
+    }
+
+    std::optional<float> ICM20948::get_magnetic_field_y_scaled() const noexcept
+    {
+        return this->magnetometer_.get_magnetic_field_y_scaled();
+    }
+
+    std::optional<float> ICM20948::get_magnetic_field_z_scaled() const noexcept
+    {
+        return this->magnetometer_.get_magnetic_field_z_scaled();
+    }
+
+    std::optional<Vec3D<float>> ICM20948::get_magnetic_field_scaled() const noexcept
+    {
+        return this->magnetometer_.get_magnetic_field_scaled();
+    }
+
     void ICM20948::initialize() noexcept
     {}
 
     void ICM20948::deinitialize() noexcept
     {}
+
+    std::optional<std::int16_t> ICM20948::get_acceleration_x_raw() const noexcept
+    {
+        return this->initialized_
+                   ? std::optional<std::int16_t>{std::bit_cast<std::int16_t>(this->get_accel_xout_registers())}
+                   : std::optional<std::int16_t>{std::nullopt};
+    }
+
+    std::optional<std::int16_t> ICM20948::get_acceleration_y_raw() const noexcept
+    {
+        return this->initialized_
+                   ? std::optional<std::int16_t>{std::bit_cast<std::int16_t>(this->get_accel_yout_registers())}
+                   : std::optional<std::int16_t>{std::nullopt};
+    }
+
+    std::optional<std::int16_t> ICM20948::get_acceleration_z_raw() const noexcept
+    {
+        return this->initialized_
+                   ? std::optional<std::int16_t>{std::bit_cast<std::int16_t>(this->get_accel_zout_registers())}
+                   : std::optional<std::int16_t>{std::nullopt};
+    }
+
+    std::optional<Vec3D<std::int16_t>> ICM20948::get_acceleration_raw() const noexcept
+    {
+        auto const accel_out = this->get_accel_out_registers();
+        return this->initialized_
+                   ? std ::optional<Vec3D<std::int16_t>>{std::in_place,
+                                                         std::bit_cast<std::int16_t>(accel_out.accel_xout),
+                                                         std::bit_cast<std::int16_t>(accel_out.accel_yout),
+                                                         std::bit_cast<std::int16_t>(accel_out.accel_zout)}
+                   : std ::optional<Vec3D<std::int16_t>>{std::nullopt};
+    }
+
+    std::optional<std::int16_t> ICM20948::get_rotation_x_raw() const noexcept
+    {
+        return this->initialized_
+                   ? std::optional<std::int16_t>{std::bit_cast<std::int16_t>(this->get_gyro_xout_registers())}
+                   : std::optional<std::int16_t>{std::nullopt};
+    }
+
+    std::optional<std::int16_t> ICM20948::get_rotation_y_raw() const noexcept
+    {
+        return this->initialized_
+                   ? std::optional<std::int16_t>{std::bit_cast<std::int16_t>(this->get_gyro_yout_registers())}
+                   : std::optional<std::int16_t>{std::nullopt};
+    }
+
+    std::optional<std::int16_t> ICM20948::get_rotation_z_raw() const noexcept
+    {
+        return this->initialized_
+                   ? std::optional<std::int16_t>{std::bit_cast<std::int16_t>(this->get_gyro_zout_registers())}
+                   : std::optional<std::int16_t>{std::nullopt};
+    }
+
+    std::optional<Vec3D<std::int16_t>> ICM20948::get_rotation_raw() const noexcept
+    {
+        auto const gyro_out = this->get_gyro_out_registers();
+        return this->initialized_ ? std ::optional<Vec3D<std::int16_t>>{std::in_place,
+                                                                        std::bit_cast<std::int16_t>(gyro_out.gyro_xout),
+                                                                        std::bit_cast<std::int16_t>(gyro_out.gyro_yout),
+                                                                        std::bit_cast<std::int16_t>(gyro_out.gyro_zout)}
+                                  : std ::optional<Vec3D<std::int16_t>>{std::nullopt};
+    }
 
     std::uint8_t ICM20948::read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept
     {
