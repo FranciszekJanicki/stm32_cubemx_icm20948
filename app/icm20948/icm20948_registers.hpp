@@ -334,7 +334,7 @@ namespace ICM20948 {
             std::uint8_t wom_threshold : 8;
         } PACKED;
 
-        struct ACCEL_CONFIG {
+        struct ACCEL_CONFIG_1 {
             std::uint8_t : 2;
             std::uint8_t accel_dlpfcfg : 3;
             std::uint8_t accel_fs_sel : 2;

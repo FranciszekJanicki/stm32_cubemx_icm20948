@@ -93,7 +93,7 @@ namespace ICM20948 {
         enum struct RA : std::uint8_t {
             GYRO_SMPLRT_DIV = 0x00,
             GYRO_CONFIG_1 = 0x01,
-            GYRO_CONFIG = 0x02,
+            GYRO_CONFIG_2 = 0x02,
             XG_OFFS_USRH = 0x03,
             XG_OFFS_USRL = 0x04,
             YG_OFFS_USRH = 0x05,
@@ -105,7 +105,7 @@ namespace ICM20948 {
             ACCEL_SMPLRT_DIV_2 = 0x11,
             ACCEL_INTEL_CTRL = 0x12,
             ACCEL_WOM_THR = 0x13,
-            ACCEL_CONFIG = 0x14,
+            ACCEL_CONFIG_1 = 0x14,
             ACCEL_CONFIG_2 = 0x15,
             FSYNC_CONFIG = 0x52,
             TEMP_CONFIG = 0x53,

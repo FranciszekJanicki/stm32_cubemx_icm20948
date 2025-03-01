@@ -31,15 +31,17 @@ namespace ICM20948 {
         void initialize() noexcept;
         void deinitialize() noexcept;
 
-        std::uint8_t read_byte(Bank0::RA const reg_address) const noexcept;
-        std::uint8_t read_byte(Bank1::RA const reg_address) const noexcept;
-        std::uint8_t read_byte(Bank2::RA const reg_address) const noexcept;
-        std::uint8_t read_byte(Bank3::RA const reg_address) const noexcept;
+        std::uint8_t read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept;
 
-        void write_byte(Bank0::RA const reg_address, std::uint8_t const byte) const noexcept;
-        void write_byte(Bank1::RA const reg_address, std::uint8_t const byte) const noexcept;
-        void write_byte(Bank2::RA const reg_address, std::uint8_t const byte) const noexcept;
-        void write_byte(Bank3::RA const reg_address, std::uint8_t const byte) const noexcept;
+        template <std::size_t SIZE>
+        std::array<std::uint8_t, SIZE> read_bytes(Bank const bank, std::uint8_t const reg_address) const noexcept;
+
+        void write_byte(Bank const bank, std::uint8_t const reg_address, std::uint8_t const byte) const noexcept;
+
+        template <std::size_t SIZE>
+        void write_bytes(Bank const bank,
+                         std::uint8_t const reg_address,
+                         std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
 
         void select_bank(Bank const bank) const noexcept;
 
@@ -189,8 +191,8 @@ namespace ICM20948 {
         Bank2::ACCEL_WOM_THR get_accel_wom_thr_register() const noexcept;
         void set_accel_wom_thr_register(Bank2::ACCEL_WOM_THR const accel_wom_thr) const noexcept;
 
-        Bank2::ACCEL_CONFIG get_accel_config_register() const noexcept;
-        void set_accel_config_register(Bank2::ACCEL_CONFIG const accel_config) const noexcept;
+        Bank2::ACCEL_CONFIG_1 get_accel_config_1_register() const noexcept;
+        void set_accel_config_1_register(Bank2::ACCEL_CONFIG_1 const accel_config_1) const noexcept;
 
         Bank2::ACCEL_CONFIG_2 get_accel_config_2_register() const noexcept;
         void set_accel_config_2_register(Bank2::ACCEL_CONFIG_2 const accel_config_2) const noexcept;
@@ -243,6 +245,22 @@ namespace ICM20948 {
 
         I2CDevice i2c_device_{};
     };
+
+    template <std::size_t SIZE>
+    std::array<std::uint8_t, SIZE> ICM20948::read_bytes(Bank const bank, std::uint8_t const reg_address) const noexcept
+    {
+        this->select_bank(bank);
+        return this->i2c_device_.read_bytes<SIZE>(reg_address);
+    }
+
+    template <std::size_t SIZE>
+    void ICM20948::write_bytes(Bank const bank,
+                               std::uint8_t const reg_address,
+                               std::array<std::uint8_t, SIZE> const& bytes) const noexcept
+    {
+        this->select_bank(bank);
+        this->i2c_device_.write_bytes(reg_address, bytes);
+    }
 
 }; // namespace ICM20948
 
