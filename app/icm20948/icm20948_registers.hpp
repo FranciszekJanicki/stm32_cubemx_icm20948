@@ -169,25 +169,9 @@ namespace ICM20948 {
             GYRO_ZOUT gyro_zout;
         } PACKED;
 
-        struct TEMP_XOUT {
-            std::uint8_t temp_xout_h : 8;
-            std::uint8_t temp_xout_l : 8;
-        } PACKED;
-
-        struct TEMP_YOUT {
-            std::uint8_t temp_yout_h : 8;
-            std::uint8_t temp_yout_l : 8;
-        } PACKED;
-
-        struct TEMP_ZOUT {
-            std::uint8_t temp_zout_h : 8;
-            std::uint8_t temp_zout_l : 8;
-        } PACKED;
-
         struct TEMP_OUT {
-            TEMP_XOUT temp_xout;
-            TEMP_YOUT temp_yout;
-            TEMP_ZOUT temp_zout;
+            std::uint8_t temp_out_h : 8;
+            std::uint8_t temp_out_l : 8;
         } PACKED;
 
         struct EXT_SLV_SENS_DATA {
@@ -245,7 +229,7 @@ namespace ICM20948 {
 
     namespace Bank1 {
 
-        struct SELF_TEXT_X_GYRO {
+        struct SELF_TEST_X_GYRO {
             std::uint8_t xg_st_data : 8;
         } PACKED;
 
@@ -269,19 +253,19 @@ namespace ICM20948 {
             std::uint8_t za_st_data : 8;
         } PACKED;
 
-        struct XA_OFFS_H {
+        struct XA_OFFS {
             std::uint8_t xa_offs_h : 8;
             std::uint8_t xa_offs_l : 7;
             std::uint8_t : 1;
         } PACKED;
 
-        struct YA_OFFS_H {
+        struct YA_OFFS {
             std::uint8_t ya_offs_h : 8;
             std::uint8_t ya_offs_l : 7;
             std::uint8_t : 1;
         } PACKED;
 
-        struct ZA_OFFS_H {
+        struct ZA_OFFS {
             std::uint8_t za_offs_h : 8;
             std::uint8_t za_offs_l : 7;
             std::uint8_t : 1;
@@ -334,13 +318,10 @@ namespace ICM20948 {
             std::uint8_t odr_align_en : 1;
         } PACKED;
 
-        struct ACCEL_SMPLRT_DIV_1 {
+        struct ACCEL_SMPLRT_DIV {
             std::uint8_t : 4;
-            std::uint8_t accel_smplrt_div : 4;
-        } PACKED;
-
-        struct ACCEL_SMPLRT_DIV_2 {
-            std::uint8_t accel_smplrt_div : 8;
+            std::uint8_t accel_smplrt_div_1 : 4;
+            std::uint8_t accel_smplrt_div_2 : 8;
         } PACKED;
 
         struct ACCEL_INTEL_CTRL {
@@ -384,13 +365,6 @@ namespace ICM20948 {
         struct MOD_CTRL_USR {
             std::uint8_t : 7;
             std::uint8_t reg_lp_dmp_en : 1;
-        } PACKED;
-
-        struct REG_BANK_SEL {
-            std::uint8_t : 2;
-            std::uint8_t user_bank : 2;
-            std::uint8_t : 4;
-
         } PACKED;
 
     }; // namespace Bank2
