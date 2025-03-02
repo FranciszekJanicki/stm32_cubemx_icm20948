@@ -22,25 +22,25 @@ namespace AK09916 {
     std::optional<float> AK09916::get_magnetic_field_x_scaled() const noexcept
     {
         return this->get_magnetic_field_x_raw().transform(
-            [SCALE](std::int16_t const raw) { return static_cast<float>(raw) / SCALE; });
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->scale_; });
     }
 
     std::optional<float> AK09916::get_magnetic_field_y_scaled() const noexcept
     {
         return this->get_magnetic_field_y_raw().transform(
-            [SCALE](std::int16_t const raw) { return static_cast<float>(raw) / SCALE; });
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->scale_; });
     }
 
     std::optional<float> AK09916::get_magnetic_field_z_scaled() const noexcept
     {
         return this->get_magnetic_field_z_raw().transform(
-            [SCALE](std::int16_t const raw) { return static_cast<float>(raw) / SCALE; });
+            [this](std::int16_t const raw) { return static_cast<float>(raw) / this->scale_; });
     }
 
     std::optional<Vec3D<float>> AK09916::get_magnetic_field_scaled() const noexcept
     {
         return this->get_magnetic_field_raw().transform(
-            [SCALE](Vec3D<std::int16_t> const& raw) { return static_cast<Vec3D<float>>(raw) / SCALE; });
+            [this](Vec3D<std::int16_t> const& raw) { return static_cast<Vec3D<float>>(raw) / this->scale_; });
     }
 
     bool AK09916::is_data_ready() const noexcept

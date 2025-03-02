@@ -79,6 +79,8 @@ namespace AK09916 {
 
         bool initialized_{false};
 
+        float scale_{SCALE};
+
         I2CDevice i2c_device_{};
     };
 

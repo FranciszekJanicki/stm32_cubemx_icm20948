@@ -4,10 +4,15 @@
 
 namespace ICM20948 {
 
-    ICM20948::ICM20948(I2CDevice&& i2c_device, AK09916&& magnetometer) noexcept :
+    ICM20948::ICM20948(I2CDevice&& i2c_device,
+                       AK09916&& magnetometer,
+                       Bank0::Config const& bank0_config,
+                       Bank1::Config const& bank1_config,
+                       Bank2::Config const& bank2_config,
+                       Bank3::Config const& bank3_config) noexcept :
         i2c_device_{std::forward<I2CDevice>(i2c_device)}, magnetometer_{std::forward<AK09916>(magnetometer)}
     {
-        this->initialize();
+        //  this->initialize();
     }
 
     ICM20948::~ICM20948() noexcept
@@ -83,11 +88,80 @@ namespace ICM20948 {
         return this->magnetometer_.get_magnetic_field_scaled();
     }
 
-    void ICM20948::initialize() noexcept
-    {}
+    void ICM20948::initialize(Bank0::Config const& bank0_config,
+                              Bank1::Config const& bank1_config,
+                              Bank2::Config const& bank2_config,
+                              Bank3::Config const& bank3_config) noexcept
+    {
+        if (this->is_valid_device_id()) {
+            this->device_reset();
+
+            this->initialize_bank(bank0_config);
+            this->initialize_bank(bank1_config);
+            this->initialize_bank(bank2_config);
+            this->initialize_bank(bank3_config);
+
+            this->initialized_ = true;
+        }
+    }
 
     void ICM20948::deinitialize() noexcept
+    {
+        if (this->is_valid_device_id()) {
+            this->device_reset();
+
+            this->initialized_ = false;
+        }
+    }
+
+    void ICM20948::initialize_bank(Bank0::Config const& config) const noexcept
+    {
+        this->set_user_ctrl_register(config.user_ctrl);
+        this->set_lp_config_register(config.lp_config);
+        this->set_pwr_mgmt_1_register(config.pwr_mgmt_1);
+        this->set_pwr_mgmt_2_register(config.pwr_mgmt_2);
+        this->set_int_pin_cfg_register(config.int_pin_cfg);
+        this->set_int_enable_register(config.int_enable);
+    }
+
+    void ICM20948::initialize_bank(Bank1::Config const& config) const noexcept
     {}
+
+    void ICM20948::initialize_bank(Bank2::Config const& config) const noexcept
+    {
+        this->set_gyro_smplrt_div_register(config.gyro_smplrt_div);
+        this->set_gyro_config_1_register(config.gyro_config_1);
+        this->set_accel_smplrt_div_registers(config.accel_smplrt_div);
+        this->set_accel_config_1_register(config.accel_config_1);
+        this->set_accel_config_2_register(config.accel_config_2);
+    }
+
+    void ICM20948::initialize_bank(Bank3::Config const& config) const noexcept
+    {}
+
+    std::uint8_t ICM20948::get_device_id() const noexcept
+    {
+        return std::bit_cast<std::uint8_t>(this->get_who_am_i_register());
+    }
+
+    bool ICM20948::is_valid_device_id() const noexcept
+    {
+        return this->get_device_id() == this->i2c_device_.dev_address();
+    }
+
+    void ICM20948::device_wake_up() const noexcept
+    {
+        this->set_pwr_mgmt_1_register(PWR_MGMT_1{0U});
+        HAL_Delay(200UL);
+    }
+
+    void ICM20948::device_reset() const noexcept
+    {
+        auto pwr_mgmt_1 = this->get_pwr_mgmt_1_register();
+        pwr_mgmt_1.device_reset = true;
+        this->set_pwr_mgmt_1_register(pwr_mgmt_1);
+        HAL_Delay(200UL);
+    }
 
     std::optional<std::int16_t> ICM20948::get_acceleration_x_raw() const noexcept
     {

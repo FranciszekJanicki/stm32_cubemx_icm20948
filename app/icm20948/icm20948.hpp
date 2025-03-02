@@ -4,12 +4,16 @@
 #include "ak09916.hpp"
 #include "i2c_device.hpp"
 #include "icm20948_config.hpp"
-#include "icm20948_dmp_mem.hpp"
 #include "icm20948_registers.hpp"
 #include "utility.hpp"
 #include <utility>
 
 namespace ICM20948 {
+
+    using namespace Bank0;
+    using namespace Bank1;
+    using namespace Bank2;
+    using namespace Bank3;
 
     struct ICM20948 {
     public:
@@ -18,7 +22,12 @@ namespace ICM20948 {
 
         ICM20948() noexcept = default;
 
-        ICM20948(I2CDevice&& i2c_device, AK09916&& magnetometer) noexcept;
+        ICM20948(I2CDevice&& i2c_device,
+                 AK09916&& magnetometer,
+                 Bank0::Config const& bank0_config,
+                 Bank1::Config const& bank1_config,
+                 Bank2::Config const& bank2_config,
+                 Bank3::Config const& bank3_config) noexcept;
 
         ICM20948(ICM20948 const& other) = delete;
         ICM20948(ICM20948&& other) noexcept = default;
@@ -44,8 +53,22 @@ namespace ICM20948 {
         std::optional<Vec3D<float>> get_magnetic_field_scaled() const noexcept;
 
     private:
-        void initialize() noexcept;
+        void initialize(Bank0::Config const& bank0_config,
+                        Bank1::Config const& bank1_config,
+                        Bank2::Config const& bank2_config,
+                        Bank3::Config const& bank3_config) noexcept;
         void deinitialize() noexcept;
+
+        void initialize_bank(Bank0::Config const& config) const noexcept;
+        void initialize_bank(Bank1::Config const& config) const noexcept;
+        void initialize_bank(Bank2::Config const& config) const noexcept;
+        void initialize_bank(Bank3::Config const& config) const noexcept;
+
+        std::uint8_t get_device_id() const noexcept;
+        bool is_valid_device_id() const noexcept;
+
+        void device_wake_up() const noexcept;
+        void device_reset() const noexcept;
 
         std::optional<std::int16_t> get_acceleration_x_raw() const noexcept;
         std::optional<std::int16_t> get_acceleration_y_raw() const noexcept;

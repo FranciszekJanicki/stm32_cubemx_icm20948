@@ -28,7 +28,20 @@ int main()
 
     auto icm20948_i2c_device = I2CDevice{&hi2c1, std::to_underlying(DevAddress::AD0_LOW)};
 
-    auto icm20948 = ICM20948::ICM20948{std::move(icm20948_i2c_device), std::move(ak09916)};
+    auto bank0_config = Bank0::Config{};
+
+    auto bank1_config = Bank1::Config{};
+
+    auto bank2_config = Bank2::Config{};
+
+    auto bank3_config = Bank3::Config{};
+
+    auto icm20948 = ICM20948::ICM20948{std::move(icm20948_i2c_device),
+                                       std::move(ak09916),
+                                       bank0_config,
+                                       bank1_config,
+                                       bank2_config,
+                                       bank3_config};
 
     while (true) {
     }

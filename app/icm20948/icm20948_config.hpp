@@ -1,6 +1,7 @@
 #ifndef ICM20948_CONFIG_HPP
 #define ICM20948_CONFIG_HPP
 
+#include "icm20948_registers.hpp"
 #include "quaternion3d.hpp"
 #include "vector3d.hpp"
 #include <cstdint>
@@ -17,8 +18,6 @@ namespace ICM20948 {
         AD0_LOW = 0b1101000,
         AD0_HIGH = 0b1101001,
     };
-
-    static constexpr std::uint8_t RA_REG_BANK_SEL = 0x7F;
 
     namespace Bank0 {
 
@@ -66,7 +65,16 @@ namespace ICM20948 {
             FIFO_CFG = 0x76,
         };
 
-    };
+        struct Config {
+            USER_CTRL user_ctrl{};
+            LP_CONFIG lp_config{};
+            PWR_MGMT_1 pwr_mgmt_1{};
+            PWR_MGMT_2 pwr_mgmt_2{};
+            INT_PIN_CFG int_pin_cfg{};
+            INT_ENABLE int_enable{};
+        };
+
+    }; // namespace Bank0
 
     namespace Bank1 {
 
@@ -86,7 +94,9 @@ namespace ICM20948 {
             TIMEBASE_CORRECTION_PLL = 0x28,
         };
 
-    };
+        struct Config {};
+
+    }; // namespace Bank1
 
     namespace Bank2 {
 
@@ -112,7 +122,16 @@ namespace ICM20948 {
             MOD_CTRL_USR = 0x54,
         };
 
-    };
+        struct Config {
+            GYRO_SMPLRT_DIV gyro_smplrt_div{};
+            GYRO_CONFIG_1 gyro_config_1{};
+            GYRO_CONFIG_2 gyro_config_2{};
+            ACCEL_SMPLRT_DIV accel_smplrt_div{};
+            ACCEL_CONFIG_1 accel_config_1{};
+            ACCEL_CONFIG_2 accel_config_2{};
+        };
+
+    }; // namespace Bank2
 
     namespace Bank3 {
 
@@ -143,7 +162,9 @@ namespace ICM20948 {
             I2C_SLV4_DI = 0x17,
         };
 
-    };
+        struct Config {};
+
+    }; // namespace Bank3
 
     enum struct Bank : std::uint8_t {
         USER_BANK_0 = 0x00,
@@ -267,7 +288,7 @@ namespace ICM20948 {
         ANYREAD = 0x01,
     };
 
-    inline float gyro_range_to_scale(GyroRange const gyro_range) noexcept
+    inline float gyro_range_to_scale(GyroRange gyro_range) noexcept
     {
         switch (gyro_range) {
             case GyroRange::GYRO_FS_250:
@@ -283,7 +304,7 @@ namespace ICM20948 {
         }
     }
 
-    inline float accel_range_to_scale(AccelRange const accel_range) noexcept
+    inline float accel_range_to_scale(AccelRange accel_range) noexcept
     {
         switch (accel_range) {
             case AccelRange::ACCEL_FS_2:
@@ -299,11 +320,12 @@ namespace ICM20948 {
         }
     }
 
+    constexpr std::uint8_t RA_REG_BANK_SEL = 0x7F;
     static constexpr auto GYRO_OUTPUT_RATE_DLPF_DIS_HZ = 1100UL;
     static constexpr auto GYRO_OUTPUT_RATE_DLPF_EN_HZ = 1100UL;
     static constexpr auto ACCEL_OUTPUT_RATE_HZ = 1125UL;
 
-    inline std::uint8_t sampling_rate_to_gyro_smplrt_div(std::uint32_t const sampling_rate, GyroLPF const dlpf) noexcept
+    inline std::uint8_t sampling_rate_to_gyro_smplrt_div(std::uint32_t sampling_rate, GyroLPF dlpf) noexcept
     {
         if (dlpf == GyroLPF::BW_377) {
             return static_cast<std::uint8_t>((GYRO_OUTPUT_RATE_DLPF_DIS_HZ / sampling_rate) - 1U);
@@ -312,7 +334,7 @@ namespace ICM20948 {
         }
     }
 
-    inline std::uint8_t sampling_rate_to_accel_smplrt_div(std::uint32_t const sampling_rate) noexcept
+    inline std::uint8_t sampling_rate_to_accel_smplrt_div(std::uint32_t sampling_rate) noexcept
     {
         return static_cast<std::uint8_t>((ACCEL_OUTPUT_RATE_HZ / sampling_rate) - 1U);
     }
