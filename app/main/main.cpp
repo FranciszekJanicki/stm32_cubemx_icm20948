@@ -10,6 +10,18 @@
 #include "usart.h"
 #include <cstdio>
 
+namespace {
+
+    volatile auto data_ready = false;
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    if (GPIO_Pin == ICM_INT_Pin) {
+        data_ready = true;
+    }
+}
+
 int main()
 {
     HAL_Init();
@@ -85,6 +97,18 @@ int main()
     auto icm20948_mag = ICM20948::ICM20948_Mag{std::move(icm20948), mag_config, SlaveNum::SLAVE1};
 
     while (true) {
+        if (data_ready) {
+            auto const& [ax, ay, az] = icm20948_mag.get_acceleration_scaled().value();
+            auto const& [gx, gy, gz] = icm20948_mag.get_rotation_scaled().value();
+            auto const& [mx, my, mz] = icm20948_mag.get_magnetic_field_scaled().value();
+
+            std::printf("ax: %f, ay: %f, az: %f\n\r", ax, ay, az);
+            std::printf("gx: %f, gy: %f, gz: %f\n\r", gx, gy, gz);
+            std::printf("mx: %f, my: %f, mz: %f\n\r", mx, my, mz);
+
+            data_ready = false;
+        }
+
         std::printf("DUPA IS HERE\n\r");
     }
 

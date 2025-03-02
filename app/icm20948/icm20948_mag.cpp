@@ -3,8 +3,6 @@
 #include "ak09916_config.hpp"
 #include "ak09916_registers.hpp"
 
-using RA = AK09916::RA;
-
 namespace ICM20948 {
 
     ICM20948_Mag::ICM20948_Mag(ICM20948&& icm20948, AK09916::Config const& config, SlaveNum const slave_num) noexcept :
@@ -245,4 +243,5 @@ namespace ICM20948 {
     {
         this->write_byte(std::to_underlying(AK09916::RA::CONTROL_3), std::bit_cast<std::uint8_t>(control_3));
     }
+
 }; // namespace ICM20948

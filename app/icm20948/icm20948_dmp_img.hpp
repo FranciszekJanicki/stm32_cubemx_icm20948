@@ -6,7 +6,7 @@
 
 namespace ICM20948 {
 
-    constexpr auto dmp_mem = std::array<std::uint8_t, 14290UL>{/* bank # 0 */
+    constexpr auto dmp_img = std::array<std::uint8_t, 14290UL>{/* bank # 0 */
                                                                0x00,
                                                                0x01,
                                                                0x00,
