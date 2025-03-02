@@ -211,7 +211,7 @@ namespace ICM20948 {
         SNAPSHOT = 0x01,
     };
 
-    enum struct GyroLPF : std::uint8_t {
+    enum struct GyroDLPF : std::uint8_t {
         BW_230 = 0x00,
         BW_188 = 0x01,
         BW_155 = 0x02,
@@ -220,10 +220,12 @@ namespace ICM20948 {
         BW_18 = 0x05,
         BW_9 = 0x06,
         BW_377 = 0x07,
+        DISABLED = BW_377,
     };
 
     enum struct GyroFIR : std::uint8_t {
         BW_774 = 0x00,
+        DISABLED = BW_774,
         BW_470 = 0x01,
         BW_258 = 0x02,
         BW_135 = 0x03,
@@ -233,7 +235,7 @@ namespace ICM20948 {
         BW_9 = 0x07,
     };
 
-    enum struct AccelLPF : std::uint8_t {
+    enum struct AccelDLPF : std::uint8_t {
         BW_265 = 0x00,
         BW_136 = 0x02,
         BW_69 = 0x03,
@@ -241,10 +243,12 @@ namespace ICM20948 {
         BW_17 = 0x05,
         BW_8 = 0x06,
         BW_499 = 0x07,
+        DISABLED = BW_499,
     };
 
     enum struct AccelFIR : std::uint8_t {
         BW_1238 = 0x00,
+        DISABLED = BW_1238,
         BW_497 = 0x00,
         BW_265 = 0x01,
         BW_137 = 0x02,
@@ -304,6 +308,11 @@ namespace ICM20948 {
         }
     }
 
+    inline float gyro_config_1_to_scale(Bank2::GYRO_CONFIG_1 const gyro_config_1) noexcept
+    {
+        return gyro_range_to_scale(static_cast<GyroRange>(gyro_config_1.gyro_fs_sel));
+    }
+
     inline float accel_range_to_scale(AccelRange accel_range) noexcept
     {
         switch (accel_range) {
@@ -320,23 +329,35 @@ namespace ICM20948 {
         }
     }
 
-    constexpr std::uint8_t RA_REG_BANK_SEL = 0x7F;
-    static constexpr auto GYRO_OUTPUT_RATE_DLPF_DIS_HZ = 1100UL;
-    static constexpr auto GYRO_OUTPUT_RATE_DLPF_EN_HZ = 1100UL;
-    static constexpr auto ACCEL_OUTPUT_RATE_HZ = 1125UL;
-
-    inline std::uint8_t sampling_rate_to_gyro_smplrt_div(std::uint32_t sampling_rate, GyroLPF dlpf) noexcept
+    inline float accel_config_1_to_scale(Bank2::ACCEL_CONFIG_1 const accel_config_1) noexcept
     {
-        if (dlpf == GyroLPF::BW_377) {
-            return static_cast<std::uint8_t>((GYRO_OUTPUT_RATE_DLPF_DIS_HZ / sampling_rate) - 1U);
-        } else {
-            return static_cast<std::uint8_t>((GYRO_OUTPUT_RATE_DLPF_EN_HZ / sampling_rate) - 1U);
-        }
+        return accel_range_to_scale(static_cast<AccelRange>(accel_config_1.accel_fs_sel));
     }
 
-    inline std::uint8_t sampling_rate_to_accel_smplrt_div(std::uint32_t sampling_rate) noexcept
+    constexpr std::uint8_t RA_REG_BANK_SEL = 0x7F;
+
+    static constexpr auto GYRO_OUTPUT_RATE_DLPF_DIS_HZ = 9000UL;
+    static constexpr auto GYRO_OUTPUT_RATE_DLPF_EN_HZ = 1125UL;
+
+    static constexpr auto ACCEL_OUTPUT_RATE_DLPF_DIS_HZ = 4500UL;
+    static constexpr auto ACCEL_OUTPUT_RATE_DLPF_EN_HZ = 1125UL;
+
+    inline std::uint16_t sampling_rate_to_gyro_smplrt_div(std::uint32_t const sampling_rate,
+                                                          GyroDLPF const dlpf = GyroDLPF::DISABLED) noexcept
     {
-        return static_cast<std::uint8_t>((ACCEL_OUTPUT_RATE_HZ / sampling_rate) - 1U);
+        return static_cast<std::uint16_t>(
+                   (dlpf == GyroDLPF::DISABLED ? GYRO_OUTPUT_RATE_DLPF_DIS_HZ : GYRO_OUTPUT_RATE_DLPF_EN_HZ) /
+                   sampling_rate) -
+               1U;
+    }
+
+    inline std::uint16_t sampling_rate_to_accel_smplrt_div(std::uint32_t const sampling_rate,
+                                                           AccelDLPF const dlpf = AccelDLPF::DISABLED) noexcept
+    {
+        return static_cast<std::uint16_t>(
+                   (dlpf == AccelDLPF::DISABLED ? ACCEL_OUTPUT_RATE_DLPF_DIS_HZ : ACCEL_OUTPUT_RATE_DLPF_EN_HZ) /
+                   sampling_rate) -
+               1U;
     }
 
 }; // namespace ICM20948

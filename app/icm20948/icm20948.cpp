@@ -10,9 +10,12 @@ namespace ICM20948 {
                        Bank1::Config const& bank1_config,
                        Bank2::Config const& bank2_config,
                        Bank3::Config const& bank3_config) noexcept :
-        i2c_device_{std::forward<I2CDevice>(i2c_device)}, magnetometer_{std::forward<AK09916>(magnetometer)}
+        accel_scale_{accel_config_1_to_scale(bank2_config.accel_config_1)},
+        gyro_scale_{gyro_config_1_to_scale(bank2_config.gyro_config_1)},
+        i2c_device_{std::forward<I2CDevice>(i2c_device)},
+        magnetometer_{std::forward<AK09916>(magnetometer)}
     {
-        //  this->initialize();
+        this->initialize(bank0_config, bank1_config, bank2_config, bank3_config);
     }
 
     ICM20948::~ICM20948() noexcept
@@ -95,12 +98,10 @@ namespace ICM20948 {
     {
         if (this->is_valid_device_id()) {
             this->device_reset();
-
             this->initialize_bank(bank0_config);
             this->initialize_bank(bank1_config);
             this->initialize_bank(bank2_config);
             this->initialize_bank(bank3_config);
-
             this->initialized_ = true;
         }
     }
@@ -109,7 +110,6 @@ namespace ICM20948 {
     {
         if (this->is_valid_device_id()) {
             this->device_reset();
-
             this->initialized_ = false;
         }
     }

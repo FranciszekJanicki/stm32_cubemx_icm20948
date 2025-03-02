@@ -320,8 +320,7 @@ namespace ICM20948 {
 
         struct ACCEL_SMPLRT_DIV {
             std::uint8_t : 4;
-            std::uint8_t accel_smplrt_div_1 : 4;
-            std::uint8_t accel_smplrt_div_2 : 8;
+            std::uint8_t accel_smplrt_div : 12;
         } PACKED;
 
         struct ACCEL_INTEL_CTRL {
