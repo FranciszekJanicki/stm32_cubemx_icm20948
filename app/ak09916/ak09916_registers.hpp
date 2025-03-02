@@ -62,6 +62,12 @@ namespace AK09916 {
         std::uint8_t srst : 1;
     } PACKED;
 
+    struct Config {
+        CONTROL_1 control_1{};
+        CONTROL_2 control_2{};
+        CONTROL_3 control_3{};
+    };
+
 }; // namespace AK09916
 
 #undef PACKED

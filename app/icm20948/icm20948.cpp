@@ -1,19 +1,18 @@
 #include "icm20948.hpp"
+#include "ak09916_registers.hpp"
 #include "icm20948_config.hpp"
 #include "icm20948_registers.hpp"
 
 namespace ICM20948 {
 
     ICM20948::ICM20948(I2CDevice&& i2c_device,
-                       AK09916&& magnetometer,
                        Bank0::Config const& bank0_config,
                        Bank1::Config const& bank1_config,
                        Bank2::Config const& bank2_config,
                        Bank3::Config const& bank3_config) noexcept :
         accel_scale_{accel_config_1_to_scale(bank2_config.accel_config_1)},
         gyro_scale_{gyro_config_1_to_scale(bank2_config.gyro_config_1)},
-        i2c_device_{std::forward<I2CDevice>(i2c_device)},
-        magnetometer_{std::forward<AK09916>(magnetometer)}
+        i2c_device_{std::forward<I2CDevice>(i2c_device)}
     {
         this->initialize(bank0_config, bank1_config, bank2_config, bank3_config);
     }
@@ -71,24 +70,26 @@ namespace ICM20948 {
             [this](Vec3D<std::int16_t> const raw) { return static_cast<Vec3D<float>>(raw) / this->gyro_scale_; });
     }
 
-    std::optional<float> ICM20948::get_magnetic_field_x_scaled() const noexcept
+    std::uint8_t ICM20948::ext_slv_read_byte(SlaveNum const slave_num, std::uint8_t const reg_address) const noexcept
     {
-        return this->magnetometer_.get_magnetic_field_x_scaled();
+        return std::uint8_t();
     }
 
-    std::optional<float> ICM20948::get_magnetic_field_y_scaled() const noexcept
+    void ICM20948::ext_slv_write_byte(SlaveNum const slave_num,
+                                      std::uint8_t const reg_address,
+                                      std::uint8_t const byte) const noexcept
+    {}
+
+    std::uint8_t ICM20948::read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept
     {
-        return this->magnetometer_.get_magnetic_field_y_scaled();
+        this->select_bank(bank);
+        return this->i2c_device_.read_byte(reg_address);
     }
 
-    std::optional<float> ICM20948::get_magnetic_field_z_scaled() const noexcept
+    void ICM20948::write_byte(Bank const bank, std::uint8_t const reg_address, std::uint8_t const byte) const noexcept
     {
-        return this->magnetometer_.get_magnetic_field_z_scaled();
-    }
-
-    std::optional<Vec3D<float>> ICM20948::get_magnetic_field_scaled() const noexcept
-    {
-        return this->magnetometer_.get_magnetic_field_scaled();
+        this->select_bank(bank);
+        this->i2c_device_.write_byte(reg_address, byte);
     }
 
     void ICM20948::initialize(Bank0::Config const& bank0_config,
@@ -224,18 +225,6 @@ namespace ICM20948 {
                                                                         std::bit_cast<std::int16_t>(gyro_out.gyro_yout),
                                                                         std::bit_cast<std::int16_t>(gyro_out.gyro_zout)}
                                   : std ::optional<Vec3D<std::int16_t>>{std::nullopt};
-    }
-
-    std::uint8_t ICM20948::read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept
-    {
-        this->select_bank(bank);
-        return this->i2c_device_.read_byte(reg_address);
-    }
-
-    void ICM20948::write_byte(Bank const bank, std::uint8_t const reg_address, std::uint8_t const byte) const noexcept
-    {
-        this->select_bank(bank);
-        this->i2c_device_.write_byte(reg_address, byte);
     }
 
     void ICM20948::select_bank(Bank const bank) const noexcept

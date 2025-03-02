@@ -1,29 +1,39 @@
-#ifndef AK09916_HPP
-#define AK09916_HPP
+#ifndef ICM20948_Mag_HPP
+#define ICM20948_Mag_HPP
 
 #include "ak09916_config.hpp"
 #include "ak09916_registers.hpp"
-#include "i2c_device.hpp"
+#include "icm20948.hpp"
 #include "utility.hpp"
 #include <optional>
 
-namespace AK09916 {
+using namespace AK09916;
 
-    struct AK09916 {
+namespace ICM20948 {
+
+    struct ICM20948_Mag {
     public:
-        using I2CDevice = Utility::I2CDevice;
+        ICM20948_Mag() noexcept = default;
 
-        AK09916() noexcept = default;
+        ICM20948_Mag(ICM20948&& base, AK09916::Config const& config, SlaveNum const slave_num) noexcept;
 
-        AK09916(I2CDevice&& i2c_device, Config const& config) noexcept;
+        ICM20948_Mag(ICM20948_Mag const& other) = delete;
+        ICM20948_Mag(ICM20948_Mag&& other) noexcept = default;
 
-        AK09916(AK09916 const& other) = delete;
-        AK09916(AK09916&& other) noexcept = default;
+        ICM20948_Mag& operator=(ICM20948_Mag const& other) = delete;
+        ICM20948_Mag& operator=(ICM20948_Mag&& other) noexcept = default;
 
-        AK09916& operator=(AK09916 const& other) = delete;
-        AK09916& operator=(AK09916&& other) noexcept = default;
+        ~ICM20948_Mag() noexcept;
 
-        ~AK09916() noexcept;
+        std::optional<float> get_acceleration_x_scaled() const noexcept;
+        std::optional<float> get_acceleration_y_scaled() const noexcept;
+        std::optional<float> get_acceleration_z_scaled() const noexcept;
+        std::optional<Vec3D<float>> get_acceleration_scaled() const noexcept;
+
+        std::optional<float> get_rotation_x_scaled() const noexcept;
+        std::optional<float> get_rotation_y_scaled() const noexcept;
+        std::optional<float> get_rotation_z_scaled() const noexcept;
+        std::optional<Vec3D<float>> get_rotation_scaled() const noexcept;
 
         std::optional<float> get_magnetic_field_x_scaled() const noexcept;
         std::optional<float> get_magnetic_field_y_scaled() const noexcept;
@@ -43,7 +53,7 @@ namespace AK09916 {
         template <std::size_t SIZE>
         void write_bytes(std::uint8_t const reg_address, std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
 
-        void initialize(Config const& config) noexcept;
+        void initialize(AK09916::Config const& config) noexcept;
         void deinitialize() noexcept;
 
         void device_reset() const noexcept;
@@ -88,22 +98,24 @@ namespace AK09916 {
 
         float scale_{SCALE};
 
-        I2CDevice i2c_device_{};
+        SlaveNum slave_num_{};
+
+        ICM20948 base_{};
     };
 
     template <std::size_t SIZE>
-    inline std::array<std::uint8_t, SIZE> AK09916::read_bytes(std::uint8_t const reg_address) const noexcept
+    inline std::array<std::uint8_t, SIZE> ICM20948_Mag::read_bytes(std::uint8_t const reg_address) const noexcept
     {
-        return this->i2c_device_.read_bytes<SIZE>(reg_address);
+        return this->base_.ext_slv_read_bytes<SIZE>(this->slave_num_, reg_address);
     }
 
     template <std::size_t SIZE>
-    inline void AK09916::write_bytes(std::uint8_t const reg_address,
-                                     std::array<std::uint8_t, SIZE> const& bytes) const noexcept
+    inline void ICM20948_Mag::write_bytes(std::uint8_t const reg_address,
+                                          std::array<std::uint8_t, SIZE> const& bytes) const noexcept
     {
-        this->i2c_device_.write_bytes(reg_address, bytes);
+        this->base_.ext_slv_write_bytes(this->slave_num_, reg_address, bytes);
     }
 
-}; // namespace AK09916
+}; // namespace ICM20948
 
-#endif // AK09916_HPP
+#endif // ICM20948_MAG_HPP

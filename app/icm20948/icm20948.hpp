@@ -14,16 +14,15 @@ namespace ICM20948 {
     using namespace Bank1;
     using namespace Bank2;
     using namespace Bank3;
+    using namespace AK09916;
 
     struct ICM20948 {
     public:
         using I2CDevice = Utility::I2CDevice;
-        using AK09916 = AK09916::AK09916;
 
         ICM20948() noexcept = default;
 
         ICM20948(I2CDevice&& i2c_device,
-                 AK09916&& magnetometer,
                  Bank0::Config const& bank0_config,
                  Bank1::Config const& bank1_config,
                  Bank2::Config const& bank2_config,
@@ -47,12 +46,34 @@ namespace ICM20948 {
         std::optional<float> get_rotation_z_scaled() const noexcept;
         std::optional<Vec3D<float>> get_rotation_scaled() const noexcept;
 
-        std::optional<float> get_magnetic_field_x_scaled() const noexcept;
-        std::optional<float> get_magnetic_field_y_scaled() const noexcept;
-        std::optional<float> get_magnetic_field_z_scaled() const noexcept;
-        std::optional<Vec3D<float>> get_magnetic_field_scaled() const noexcept;
+        std::uint8_t ext_slv_read_byte(SlaveNum const slave_num, std::uint8_t const reg_address) const noexcept;
+
+        template <std::size_t SIZE>
+        std::array<std::uint8_t, SIZE> ext_slv_read_bytes(SlaveNum const slave_num,
+                                                          std::uint8_t const reg_address) const noexcept;
+
+        void ext_slv_write_byte(SlaveNum const slave_num,
+                                std::uint8_t const reg_address,
+                                std::uint8_t const byte) const noexcept;
+
+        template <std::size_t SIZE>
+        void ext_slv_write_bytes(SlaveNum const slave_num,
+                                 std::uint8_t const reg_address,
+                                 std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
 
     private:
+        std::uint8_t read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept;
+
+        template <std::size_t SIZE>
+        std::array<std::uint8_t, SIZE> read_bytes(Bank const bank, std::uint8_t const reg_address) const noexcept;
+
+        void write_byte(Bank const bank, std::uint8_t const reg_address, std::uint8_t const byte) const noexcept;
+
+        template <std::size_t SIZE>
+        void write_bytes(Bank const bank,
+                         std::uint8_t const reg_address,
+                         std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
+
         void initialize(Bank0::Config const& bank0_config,
                         Bank1::Config const& bank1_config,
                         Bank2::Config const& bank2_config,
@@ -79,18 +100,6 @@ namespace ICM20948 {
         std::optional<std::int16_t> get_rotation_y_raw() const noexcept;
         std::optional<std::int16_t> get_rotation_z_raw() const noexcept;
         std::optional<Vec3D<std::int16_t>> get_rotation_raw() const noexcept;
-
-        std::uint8_t read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept;
-
-        template <std::size_t SIZE>
-        std::array<std::uint8_t, SIZE> read_bytes(Bank const bank, std::uint8_t const reg_address) const noexcept;
-
-        void write_byte(Bank const bank, std::uint8_t const reg_address, std::uint8_t const byte) const noexcept;
-
-        template <std::size_t SIZE>
-        void write_bytes(Bank const bank,
-                         std::uint8_t const reg_address,
-                         std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
 
         void select_bank(Bank const bank) const noexcept;
 
@@ -296,8 +305,6 @@ namespace ICM20948 {
         float gyro_scale_{};
 
         I2CDevice i2c_device_{};
-
-        AK09916 magnetometer_{};
     };
 
     template <std::size_t SIZE>
@@ -315,6 +322,19 @@ namespace ICM20948 {
         this->select_bank(bank);
         this->i2c_device_.write_bytes(reg_address, bytes);
     }
+
+    template <std::size_t SIZE>
+    inline std::array<std::uint8_t, SIZE> ICM20948::ext_slv_read_bytes(SlaveNum const slave_num,
+                                                                       std::uint8_t const reg_address) const noexcept
+    {
+        return std::array<std::uint8_t, SIZE>();
+    }
+
+    template <std::size_t SIZE>
+    inline void ICM20948::ext_slv_write_bytes(SlaveNum const slave_num,
+                                              std::uint8_t const reg_address,
+                                              std::array<std::uint8_t, SIZE> const& bytes) const noexcept
+    {}
 
 }; // namespace ICM20948
 

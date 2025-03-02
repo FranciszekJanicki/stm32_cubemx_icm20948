@@ -3,6 +3,7 @@ add_library(icm20948 STATIC)
 target_sources(icm20948 PRIVATE 
     "icm20948.cpp"
     "icm20948_dmp.cpp"
+    "icm20948_mag.cpp"
 )
 
 target_include_directories(icm20948 PUBLIC 

@@ -5,13 +5,10 @@
 
 namespace AK09916 {
 
-    AK09916::AK09916(I2CDevice&& i2c_device,
-                     CONTROL_1 const control_1,
-                     CONTROL_2 const control_2,
-                     CONTROL_3 const control_3) noexcept :
+    AK09916::AK09916(I2CDevice&& i2c_device, Config const& config) noexcept :
         i2c_device_{std::forward<I2CDevice>(i2c_device)}
     {
-        this->initialize(control_1, control_2, control_3);
+        this->initialize(config);
     }
 
     AK09916::~AK09916() noexcept
@@ -48,13 +45,23 @@ namespace AK09916 {
         return this->get_status_1_register().drdy;
     }
 
-    void AK09916::initialize(CONTROL_1 const control_1, CONTROL_2 const control_2, CONTROL_3 const control_3) noexcept
+    std::uint8_t AK09916::read_byte(std::uint8_t const reg_address) const noexcept
+    {
+        return this->i2c_device_.read_byte(reg_address);
+    }
+
+    void AK09916::write_byte(std::uint8_t const reg_address, std::uint8_t const byte) const noexcept
+    {
+        this->i2c_device_.write_byte(reg_address, byte);
+    }
+
+    void AK09916::initialize(Config const& config) noexcept
     {
         if (this->is_valid_device_id() && this->is_valid_company_id()) {
             this->device_reset();
-            this->set_control_1_register(control_1);
-            this->set_control_2_register(control_2);
-            this->set_control_3_register(control_3);
+            this->set_control_1_register(config.control_1);
+            this->set_control_2_register(config.control_2);
+            this->set_control_3_register(config.control_3);
             this->initialized_ = true;
         }
     }
@@ -129,72 +136,72 @@ namespace AK09916 {
 
     WHO_AM_I_1 AK09916::get_who_am_1_register() const noexcept
     {
-        return std::bit_cast<WHO_AM_I_1>(this->i2c_device_.read_byte(std::to_underlying(RA::WHO_AM_I_1)));
+        return std::bit_cast<WHO_AM_I_1>(this->read_byte(std::to_underlying(RA::WHO_AM_I_1)));
     }
 
     WHO_AM_I_2 AK09916::get_who_am_2_register() const noexcept
     {
-        return std::bit_cast<WHO_AM_I_2>(this->i2c_device_.read_byte(std::to_underlying(RA::WHO_AM_I_2)));
+        return std::bit_cast<WHO_AM_I_2>(this->read_byte(std::to_underlying(RA::WHO_AM_I_2)));
     }
 
     STATUS_1 AK09916::get_status_1_register() const noexcept
     {
-        return std::bit_cast<STATUS_1>(this->i2c_device_.read_byte(std::to_underlying(RA::STATUS_1)));
+        return std::bit_cast<STATUS_1>(this->read_byte(std::to_underlying(RA::STATUS_1)));
     }
 
     XOUT AK09916::get_xout_registers() const noexcept
     {
-        return std::bit_cast<XOUT>(this->i2c_device_.read_bytes<sizeof(XOUT)>(std::to_underlying(RA::XOUT_L)));
+        return std::bit_cast<XOUT>(this->read_bytes<sizeof(XOUT)>(std::to_underlying(RA::XOUT_L)));
     }
 
     YOUT AK09916::get_yout_registers() const noexcept
     {
-        return std::bit_cast<YOUT>(this->i2c_device_.read_bytes<sizeof(YOUT)>(std::to_underlying(RA::YOUT_L)));
+        return std::bit_cast<YOUT>(this->read_bytes<sizeof(YOUT)>(std::to_underlying(RA::YOUT_L)));
     }
 
     ZOUT AK09916::get_zout_registers() const noexcept
     {
-        return std::bit_cast<ZOUT>(this->i2c_device_.read_bytes<sizeof(ZOUT)>(std::to_underlying(RA::ZOUT_L)));
+        return std::bit_cast<ZOUT>(this->read_bytes<sizeof(ZOUT)>(std::to_underlying(RA::ZOUT_L)));
     }
 
     OUT AK09916::get_out_registers() const noexcept
     {
-        return std::bit_cast<OUT>(this->i2c_device_.read_bytes<sizeof(OUT)>(std::to_underlying(RA::XOUT_L)));
+        return std::bit_cast<OUT>(this->read_bytes<sizeof(OUT)>(std::to_underlying(RA::XOUT_L)));
     }
 
     STATUS_2 AK09916::get_status_2_register() const noexcept
     {
-        return std::bit_cast<STATUS_2>(this->i2c_device_.read_byte(std::to_underlying(RA::STATUS_2)));
+        return std::bit_cast<STATUS_2>(this->read_byte(std::to_underlying(RA::STATUS_2)));
     }
 
     CONTROL_1 AK09916::get_control_1_register() const noexcept
     {
-        return std::bit_cast<CONTROL_1>(this->i2c_device_.read_byte(std::to_underlying(RA::CONTROL_1)));
+        return std::bit_cast<CONTROL_1>(this->read_byte(std::to_underlying(RA::CONTROL_1)));
     }
 
     void AK09916::set_control_1_register(CONTROL_1 const control_1) const noexcept
     {
-        this->i2c_device_.write_byte(std::to_underlying(RA::CONTROL_1), std::bit_cast<std::uint8_t>(control_1));
+        this->write_byte(std::to_underlying(RA::CONTROL_1), std::bit_cast<std::uint8_t>(control_1));
     }
 
     CONTROL_2 AK09916::get_control_2_register() const noexcept
     {
-        return std::bit_cast<CONTROL_2>(this->i2c_device_.read_byte(std::to_underlying(RA::CONTROL_2)));
+        return std::bit_cast<CONTROL_2>(this->read_byte(std::to_underlying(RA::CONTROL_2)));
     }
 
     void AK09916::set_control_2_register(CONTROL_2 const control_2) const noexcept
     {
-        this->i2c_device_.write_byte(std::to_underlying(RA::CONTROL_2), std::bit_cast<std::uint8_t>(control_2));
+        this->write_byte(std::to_underlying(RA::CONTROL_2), std::bit_cast<std::uint8_t>(control_2));
     }
 
     CONTROL_3 AK09916::get_control_3_register() const noexcept
     {
-        return std::bit_cast<CONTROL_3>(this->i2c_device_.read_byte(std::to_underlying(RA::CONTROL_3)));
+        return std::bit_cast<CONTROL_3>(this->read_byte(std::to_underlying(RA::CONTROL_3)));
     }
 
     void AK09916::set_control_3_register(CONTROL_3 const control_3) const noexcept
     {
-        this->i2c_device_.write_byte(std::to_underlying(RA::CONTROL_3), std::bit_cast<std::uint8_t>(control_3));
+        this->write_byte(std::to_underlying(RA::CONTROL_3), std::bit_cast<std::uint8_t>(control_3));
     }
 
 }; // namespace AK09916
