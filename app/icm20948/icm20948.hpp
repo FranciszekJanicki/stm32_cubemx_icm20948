@@ -46,20 +46,30 @@ namespace ICM20948 {
         std::optional<float> get_rotation_z_scaled() const noexcept;
         std::optional<Vec3D<float>> get_rotation_scaled() const noexcept;
 
-        std::uint8_t ext_slv_read_byte(SlaveNum const slave_num, std::uint8_t const reg_address) const noexcept;
+        std::uint8_t ext_slv_read_byte(SlaveNum const slave_num, std::uint8_t const slave_reg_address) const noexcept;
 
         template <std::size_t SIZE>
         std::array<std::uint8_t, SIZE> ext_slv_read_bytes(SlaveNum const slave_num,
-                                                          std::uint8_t const reg_address) const noexcept;
+                                                          std::uint8_t const slave_reg_address) const noexcept;
 
         void ext_slv_write_byte(SlaveNum const slave_num,
-                                std::uint8_t const reg_address,
+                                std::uint8_t const slave_reg_address,
                                 std::uint8_t const byte) const noexcept;
 
         template <std::size_t SIZE>
         void ext_slv_write_bytes(SlaveNum const slave_num,
-                                 std::uint8_t const reg_address,
+                                 std::uint8_t const slave_reg_address,
                                  std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
+
+        std::uint8_t fifo_read_byte() const noexcept;
+
+        template <std::size_t SIZE>
+        std::array<std::uint8_t, SIZE> fifo_read_bytes() const noexcept;
+
+        void fifo_write_byte(std::uint8_t const byte) const noexcept;
+
+        template <std::size_t SIZE>
+        void fifo_write_bytes(std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
 
     private:
         std::uint8_t read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept;
@@ -193,10 +203,10 @@ namespace ICM20948 {
         void set_self_test_x_gyro_register(Bank1::SELF_TEST_X_GYRO const self_text_x_gyro) const noexcept;
 
         Bank1::SELF_TEST_Y_GYRO get_self_test_y_gyro_register() const noexcept;
-        void set_self_test_x_gyro_register(Bank1::SELF_TEST_Y_GYRO const self_text_y_gyro) const noexcept;
+        void set_self_test_y_gyro_register(Bank1::SELF_TEST_Y_GYRO const self_text_y_gyro) const noexcept;
 
         Bank1::SELF_TEST_Z_GYRO get_self_test_z_gyro_register() const noexcept;
-        void set_self_test_x_gyro_register(Bank1::SELF_TEST_Z_GYRO const self_text_z_gyro) const noexcept;
+        void set_self_test_z_gyro_register(Bank1::SELF_TEST_Z_GYRO const self_text_z_gyro) const noexcept;
 
         Bank1::SELF_TEST_X_ACCEL get_self_test_x_accel_register() const noexcept;
         void set_self_test_x_accel_register(Bank1::SELF_TEST_X_ACCEL const self_text_x_accel) const noexcept;
@@ -277,7 +287,7 @@ namespace ICM20948 {
         void set_i2c_slv_addr_register(SlaveNum const slave_num, Bank3::I2C_SLV_ADDR const i2c_slv_addr) const noexcept;
 
         Bank3::I2C_SLV_REG get_i2c_slv_reg_register(SlaveNum const slave_num) const noexcept;
-        void set_i2c_slv_reg_register(SlaveNum const slave_num, Bank3::I2C_SLV_REG const i2c_slv_reg) const noexcept;
+        void set_i2c_slv_reg_register(SlaveNum const slave_num, Bank3::I2C_SLV_REG const i2c_slave_reg) const noexcept;
 
         Bank3::I2C_SLV_CTRL get_i2c_slv_ctrl_register(SlaveNum const slave_num) const noexcept;
         void set_i2c_slv_ctrl_register(SlaveNum const slave_num, Bank3::I2C_SLV_CTRL const i2c_slv_ctrl) const noexcept;
@@ -324,17 +334,57 @@ namespace ICM20948 {
     }
 
     template <std::size_t SIZE>
-    inline std::array<std::uint8_t, SIZE> ICM20948::ext_slv_read_bytes(SlaveNum const slave_num,
-                                                                       std::uint8_t const reg_address) const noexcept
+    inline std::array<std::uint8_t, SIZE>
+    ICM20948::ext_slv_read_bytes(SlaveNum const slave_num, std::uint8_t const slave_reg_address) const noexcept
     {
-        return std::array<std::uint8_t, SIZE>();
+        auto i2c_slv_addr = this->get_i2c_slv_addr_register(slave_num);
+        i2c_slv_addr.i2c_slv_rnw = true;
+        this->set_i2c_slv_addr_register(slave_num, i2c_slv_addr);
+
+        auto i2c_slv_reg = this->get_i2c_slv_reg_register(slave_num);
+        i2c_slv_reg.i2c_slv_reg = slave_reg_address;
+        this->set_i2c_slv_reg_register(slave_num, i2c_slv_reg);
+
+        auto i2c_slv_ctrl = this->get_i2c_slv_ctrl_register(slave_num);
+        i2c_slv_ctrl.i2c_slv_leng = SIZE;
+        this->set_i2c_slv_ctrl_register(slave_num, i2c_slv_ctrl);
+
+        return this->read_bytes<SIZE>(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::EXT_SLV_SENS_DATA_00));
     }
 
     template <std::size_t SIZE>
     inline void ICM20948::ext_slv_write_bytes(SlaveNum const slave_num,
-                                              std::uint8_t const reg_address,
+                                              std::uint8_t const slave_reg_address,
                                               std::array<std::uint8_t, SIZE> const& bytes) const noexcept
-    {}
+    {
+        auto i2c_slv_addr = this->get_i2c_slv_addr_register(slave_num);
+        i2c_slv_addr.i2c_slv_rnw = false;
+        this->set_i2c_slv_addr_register(slave_num, i2c_slv_addr);
+
+        auto i2c_slv_reg = this->get_i2c_slv_reg_register(slave_num);
+        i2c_slv_reg.i2c_slv_reg = slave_reg_address;
+        this->set_i2c_slv_reg_register(slave_num, i2c_slv_reg);
+
+        auto i2c_slv_ctrl = this->get_i2c_slv_ctrl_register(slave_num);
+        i2c_slv_ctrl.i2c_slv_leng = SIZE;
+        this->set_i2c_slv_ctrl_register(slave_num, i2c_slv_ctrl);
+
+        for (auto const byte : bytes) {
+            this->set_i2c_slv_do_register(slave_num, I2C_SLV_DO{.i2c_slv_do = byte});
+        }
+    }
+
+    template <std::size_t SIZE>
+    inline std::array<std::uint8_t, SIZE> ICM20948::fifo_read_bytes() const noexcept
+    {
+        return this->read_bytes<SIZE>(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::FIFO_R_W));
+    }
+
+    template <std::size_t SIZE>
+    inline void ICM20948::fifo_write_bytes(std::array<std::uint8_t, SIZE> const& bytes) const noexcept
+    {
+        this->write_bytes(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::FIFO_R_W), bytes);
+    }
 
 }; // namespace ICM20948
 

@@ -70,15 +70,52 @@ namespace ICM20948 {
             [this](Vec3D<std::int16_t> const raw) { return static_cast<Vec3D<float>>(raw) / this->gyro_scale_; });
     }
 
-    std::uint8_t ICM20948::ext_slv_read_byte(SlaveNum const slave_num, std::uint8_t const reg_address) const noexcept
+    std::uint8_t ICM20948::ext_slv_read_byte(SlaveNum const slave_num,
+                                             std::uint8_t const slave_reg_address) const noexcept
     {
-        return std::uint8_t();
+        auto i2c_slv_addr = this->get_i2c_slv_addr_register(slave_num);
+        i2c_slv_addr.i2c_slv_rnw = true;
+        this->set_i2c_slv_addr_register(slave_num, i2c_slv_addr);
+
+        auto i2c_slv_reg = this->get_i2c_slv_reg_register(slave_num);
+        i2c_slv_reg.i2c_slv_reg = slave_reg_address;
+        this->set_i2c_slv_reg_register(slave_num, i2c_slv_reg);
+
+        auto i2c_slv_ctrl = this->get_i2c_slv_ctrl_register(slave_num);
+        i2c_slv_ctrl.i2c_slv_leng = 1U;
+        this->set_i2c_slv_ctrl_register(slave_num, i2c_slv_ctrl);
+
+        return this->read_byte(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::EXT_SLV_SENS_DATA_00));
     }
 
     void ICM20948::ext_slv_write_byte(SlaveNum const slave_num,
-                                      std::uint8_t const reg_address,
+                                      std::uint8_t const slave_reg_address,
                                       std::uint8_t const byte) const noexcept
-    {}
+    {
+        auto i2c_slv_addr = this->get_i2c_slv_addr_register(slave_num);
+        i2c_slv_addr.i2c_slv_rnw = false;
+        this->set_i2c_slv_addr_register(slave_num, i2c_slv_addr);
+
+        auto i2c_slv_reg = this->get_i2c_slv_reg_register(slave_num);
+        i2c_slv_reg.i2c_slv_reg = slave_reg_address;
+        this->set_i2c_slv_reg_register(slave_num, i2c_slv_reg);
+
+        auto i2c_slv_ctrl = this->get_i2c_slv_ctrl_register(slave_num);
+        i2c_slv_ctrl.i2c_slv_leng = 1U;
+        this->set_i2c_slv_ctrl_register(slave_num, i2c_slv_ctrl);
+
+        this->set_i2c_slv_do_register(slave_num, I2C_SLV_DO{.i2c_slv_do = byte});
+    }
+
+    std::uint8_t ICM20948::fifo_read_byte() const noexcept
+    {
+        return this->read_byte(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::FIFO_R_W));
+    }
+
+    void ICM20948::fifo_write_byte(std::uint8_t const byte) const noexcept
+    {
+        this->write_byte(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::FIFO_R_W), byte);
+    }
 
     std::uint8_t ICM20948::read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept
     {
@@ -561,7 +598,11 @@ namespace ICM20948 {
     }
 
     void ICM20948::set_self_test_x_gyro_register(Bank1::SELF_TEST_X_GYRO const self_text_x_gyro) const noexcept
-    {}
+    {
+        this->write_byte(Bank::USER_BANK_1,
+                         std::to_underlying(Bank1::RA::SELF_TEST_X_GYRO),
+                         std::bit_cast<std::uint8_t>(self_text_x_gyro));
+    }
 
     Bank1::SELF_TEST_Y_GYRO ICM20948::get_self_test_y_gyro_register() const noexcept
     {
@@ -569,7 +610,7 @@ namespace ICM20948 {
             this->read_byte(Bank::USER_BANK_1, std::to_underlying(Bank1::RA::SELF_TEST_Y_GYRO)));
     }
 
-    void ICM20948::set_self_test_x_gyro_register(Bank1::SELF_TEST_Y_GYRO const self_text_y_gyro) const noexcept
+    void ICM20948::set_self_test_y_gyro_register(Bank1::SELF_TEST_Y_GYRO const self_text_y_gyro) const noexcept
     {
         this->write_byte(Bank::USER_BANK_1,
                          std::to_underlying(Bank1::RA::SELF_TEST_Y_ACCEL),
@@ -582,7 +623,7 @@ namespace ICM20948 {
             this->read_byte(Bank::USER_BANK_1, std::to_underlying(Bank1::RA::SELF_TEST_Z_GYRO)));
     }
 
-    void ICM20948::set_self_test_x_gyro_register(Bank1::SELF_TEST_Z_GYRO const self_text_z_gyro) const noexcept
+    void ICM20948::set_self_test_z_gyro_register(Bank1::SELF_TEST_Z_GYRO const self_text_z_gyro) const noexcept
     {
         this->write_byte(Bank::USER_BANK_1,
                          std::to_underlying(Bank1::RA::SELF_TEST_Z_GYRO),
@@ -942,11 +983,11 @@ namespace ICM20948 {
     }
 
     void ICM20948::set_i2c_slv_reg_register(SlaveNum const slave_num,
-                                            Bank3::I2C_SLV_REG const i2c_slv_reg) const noexcept
+                                            Bank3::I2C_SLV_REG const i2c_slave_reg) const noexcept
     {
         this->write_byte(Bank::USER_BANK_3,
                          std::to_underlying(Bank3::RA::I2C_SLV0_REG) + 3U * std::to_underlying(slave_num),
-                         std::bit_cast<std::uint8_t>(i2c_slv_reg));
+                         std::bit_cast<std::uint8_t>(i2c_slave_reg));
     }
 
     Bank3::I2C_SLV_CTRL ICM20948::get_i2c_slv_ctrl_register(SlaveNum const slave_num) const noexcept
