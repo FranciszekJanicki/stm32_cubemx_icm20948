@@ -71,7 +71,7 @@ namespace ICM20948 {
         template <std::size_t SIZE>
         void fifo_write_bytes(std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
 
-    private:
+        // private:
         std::uint8_t read_byte(Bank const bank, std::uint8_t const reg_address) const noexcept;
 
         template <std::size_t SIZE>
