@@ -70,7 +70,7 @@ namespace Utility {
         std::uint16_t dev_address() const noexcept;
 
     private:
-        static constexpr std::uint32_t TIMEOUT{100U};
+        static constexpr std::uint32_t TIMEOUT{1000U};
         static constexpr std::uint32_t SCAN_RETRIES{10U};
 
         void initialize() noexcept;

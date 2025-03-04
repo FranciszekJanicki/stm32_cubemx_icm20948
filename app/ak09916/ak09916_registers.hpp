@@ -22,18 +22,15 @@ namespace AK09916 {
     } PACKED;
 
     struct XOUT {
-        std::uint8_t xout_l : 8;
-        std::uint8_t xout_h : 8;
+        std::uint16_t xout : 16;
     } PACKED;
 
     struct YOUT {
-        std::uint8_t yout_l : 8;
-        std::uint8_t yout_h : 8;
+        std::uint16_t yout : 16;
     } PACKED;
 
     struct ZOUT {
-        std::uint8_t zout_l : 8;
-        std::uint8_t zout_h : 8;
+        std::uint16_t zout : 16;
     } PACKED;
 
     struct OUT {

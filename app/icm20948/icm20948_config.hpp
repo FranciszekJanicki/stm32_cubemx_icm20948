@@ -100,6 +100,13 @@ namespace ICM20948 {
             PWR_MGMT_2 pwr_mgmt_2{};
             INT_PIN_CFG int_pin_cfg{};
             INT_ENABLE int_enable{};
+            INT_ENABLE_1 int_enable_1{};
+            INT_ENABLE_2 int_enable_2{};
+            INT_ENABLE_3 int_enable_3{};
+            FIFO_EN_1 fifo_en_1{};
+            FIFO_EN_2 fifo_en_2{};
+            FIFO_MODE fifo_mode{};
+            FIFO_CFG fifo_cfg{};
         };
 
     }; // namespace Bank0
@@ -122,7 +129,9 @@ namespace ICM20948 {
             TIMEBASE_CORRECTION_PLL = 0x28,
         };
 
-        struct Config {};
+        struct Config {
+            XA_OFFS xa_offs{};
+        };
 
     }; // namespace Bank1
 
@@ -240,20 +249,18 @@ namespace ICM20948 {
     };
 
     enum struct GyroDLPF : std::uint8_t {
-        BW_230 = 0x00,
-        BW_188 = 0x01,
-        BW_155 = 0x02,
-        BW_73 = 0x03,
-        BW_36 = 0x04,
-        BW_18 = 0x05,
-        BW_9 = 0x06,
-        BW_377 = 0x07,
-        DISABLED = BW_377,
+        BW_197 = 0x00,
+        BW_152 = 0x01,
+        BW_120 = 0x02,
+        BW_51 = 0x03,
+        BW_24 = 0x04,
+        BW_12 = 0x05,
+        BW_6 = 0x06,
+        BW_361 = 0x07,
     };
 
     enum struct GyroFIR : std::uint8_t {
         BW_774 = 0x00,
-        DISABLED = BW_774,
         BW_470 = 0x01,
         BW_258 = 0x02,
         BW_135 = 0x03,
@@ -271,12 +278,10 @@ namespace ICM20948 {
         BW_17 = 0x05,
         BW_8 = 0x06,
         BW_499 = 0x07,
-        DISABLED = BW_499,
     };
 
     enum struct AccelFIR : std::uint8_t {
         BW_1238 = 0x00,
-        DISABLED = BW_1238,
         BW_497 = 0x00,
         BW_265 = 0x01,
         BW_137 = 0x02,
@@ -363,28 +368,31 @@ namespace ICM20948 {
     }
 
     constexpr std::uint8_t RA_REG_BANK_SEL = 0x7F;
+    constexpr std::uint8_t DEVICE_ID = 0xEA;
 
-    static constexpr auto GYRO_OUTPUT_RATE_DLPF_DIS_HZ = 9000UL;
-    static constexpr auto GYRO_OUTPUT_RATE_DLPF_EN_HZ = 1125UL;
+    namespace {
 
-    static constexpr auto ACCEL_OUTPUT_RATE_DLPF_DIS_HZ = 4500UL;
-    static constexpr auto ACCEL_OUTPUT_RATE_DLPF_EN_HZ = 1125UL;
+        constexpr auto GYRO_OUTPUT_RATE_DLPF_DIS_HZ = 9000UL;
+        constexpr auto GYRO_OUTPUT_RATE_DLPF_EN_HZ = 1100UL;
+
+        constexpr auto ACCEL_OUTPUT_RATE_DLPF_DIS_HZ = 4500UL;
+        constexpr auto ACCEL_OUTPUT_RATE_DLPF_EN_HZ = 1125UL;
+
+    }; // namespace
 
     inline std::uint16_t sampling_rate_to_gyro_smplrt_div(std::uint32_t const sampling_rate,
-                                                          GyroDLPF const dlpf = GyroDLPF::DISABLED) noexcept
+                                                          bool const dlpf_enabled = false) noexcept
     {
-        return static_cast<std::uint16_t>(
-                   (dlpf == GyroDLPF::DISABLED ? GYRO_OUTPUT_RATE_DLPF_DIS_HZ : GYRO_OUTPUT_RATE_DLPF_EN_HZ) /
-                   sampling_rate) -
+        return static_cast<std::uint16_t>((dlpf_enabled ? GYRO_OUTPUT_RATE_DLPF_EN_HZ : GYRO_OUTPUT_RATE_DLPF_DIS_HZ) /
+                                          sampling_rate) -
                1U;
     }
 
     inline std::uint16_t sampling_rate_to_accel_smplrt_div(std::uint32_t const sampling_rate,
-                                                           AccelDLPF const dlpf = AccelDLPF::DISABLED) noexcept
+                                                           bool const dlpf_enabled = false) noexcept
     {
         return static_cast<std::uint16_t>(
-                   (dlpf == AccelDLPF::DISABLED ? ACCEL_OUTPUT_RATE_DLPF_DIS_HZ : ACCEL_OUTPUT_RATE_DLPF_EN_HZ) /
-                   sampling_rate) -
+                   (dlpf_enabled ? ACCEL_OUTPUT_RATE_DLPF_EN_HZ : ACCEL_OUTPUT_RATE_DLPF_DIS_HZ) / sampling_rate) -
                1U;
     }
 

@@ -135,7 +135,7 @@ namespace ICM20948 {
                               Bank3::Config const& bank3_config) noexcept
     {
         if (this->is_valid_device_id()) {
-            this->device_reset();
+            this->device_wake_up();
             this->initialize_bank(bank0_config);
             this->initialize_bank(bank1_config);
             this->initialize_bank(bank2_config);
@@ -154,12 +154,15 @@ namespace ICM20948 {
 
     void ICM20948::initialize_bank(Bank0::Config const& config) const noexcept
     {
-        this->set_user_ctrl_register(config.user_ctrl);
-        this->set_lp_config_register(config.lp_config);
+        // this->set_user_ctrl_register(config.user_ctrl);
+        // this->set_lp_config_register(config.lp_config);
         this->set_pwr_mgmt_1_register(config.pwr_mgmt_1);
         this->set_pwr_mgmt_2_register(config.pwr_mgmt_2);
         this->set_int_pin_cfg_register(config.int_pin_cfg);
         this->set_int_enable_register(config.int_enable);
+        this->set_int_enable_1_register(config.int_enable_1);
+        this->set_int_enable_2_register(config.int_enable_2);
+        this->set_int_enable_3_register(config.int_enable_3);
     }
 
     void ICM20948::initialize_bank(Bank1::Config const& config) const noexcept
@@ -179,17 +182,21 @@ namespace ICM20948 {
 
     std::uint8_t ICM20948::get_device_id() const noexcept
     {
-        return std::bit_cast<std::uint8_t>(this->get_who_am_i_register());
+        auto device_id = std::bit_cast<std::uint8_t>(this->get_who_am_i_register());
+        printf("device id: %d\n\r", device_id);
+        return device_id;
     }
 
     bool ICM20948::is_valid_device_id() const noexcept
     {
-        return this->get_device_id() == this->i2c_device_.dev_address();
+        return this->get_device_id() == DEVICE_ID;
     }
 
     void ICM20948::device_wake_up() const noexcept
     {
-        this->set_pwr_mgmt_1_register(PWR_MGMT_1{0U});
+        auto pwr_mgmt_1 = this->get_pwr_mgmt_1_register();
+        pwr_mgmt_1.sleep = false;
+        this->set_pwr_mgmt_1_register(pwr_mgmt_1);
         HAL_Delay(200UL);
     }
 
@@ -498,7 +505,7 @@ namespace ICM20948 {
     Bank0::EXT_SLV_SENS_DATA ICM20948::get_ext_slv_sens_data_register(std::uint8_t const num) const noexcept
     {
         return std::bit_cast<Bank0::EXT_SLV_SENS_DATA>(
-            this->read_byte(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::EXT_SLV_SENS_DATA_00)));
+            this->read_byte(Bank::USER_BANK_0, std::to_underlying(Bank0::RA::EXT_SLV_SENS_DATA_00) + num));
     }
 
     Bank0::FIFO_EN_1 ICM20948::get_fifo_en_1_register() const noexcept

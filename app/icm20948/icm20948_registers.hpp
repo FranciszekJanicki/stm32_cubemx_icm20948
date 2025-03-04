@@ -123,23 +123,19 @@ namespace ICM20948 {
         } PACKED;
 
         struct DELAY_TIME {
-            std::uint8_t delay_time_h : 8;
-            std::uint8_t delay_time_l : 8;
+            std::uint16_t delay_time : 16;
         } PACKED;
 
         struct ACCEL_XOUT {
-            std::uint8_t accel_xout_h : 8;
-            std::uint8_t accel_xout_l : 8;
+            std::uint16_t accel_xout : 16;
         } PACKED;
 
         struct ACCEL_YOUT {
-            std::uint8_t accel_yout_h : 8;
-            std::uint8_t accel_yout_l : 8;
+            std::uint16_t accel_yout : 16;
         } PACKED;
 
         struct ACCEL_ZOUT {
-            std::uint8_t accel_zout_h : 8;
-            std::uint8_t accel_zout_l : 8;
+            std::uint16_t accel_zout : 16;
         } PACKED;
 
         struct ACCEL_OUT {
@@ -149,18 +145,15 @@ namespace ICM20948 {
         } PACKED;
 
         struct GYRO_XOUT {
-            std::uint8_t gyro_xout_h : 8;
-            std::uint8_t gyro_xout_l : 8;
+            std::uint16_t gyro_xout : 16;
         } PACKED;
 
         struct GYRO_YOUT {
-            std::uint8_t gyro_yout_h : 8;
-            std::uint8_t gyro_yout_l : 8;
+            std::uint16_t gyro_yout : 16;
         } PACKED;
 
         struct GYRO_ZOUT {
-            std::uint8_t gyro_zout_h : 8;
-            std::uint8_t gyro_zout_l : 8;
+            std::uint16_t gyro_zout : 16;
         } PACKED;
 
         struct GYRO_OUT {
@@ -170,8 +163,7 @@ namespace ICM20948 {
         } PACKED;
 
         struct TEMP_OUT {
-            std::uint8_t temp_out_h : 8;
-            std::uint8_t temp_out_l : 8;
+            std::uint16_t temp_out : 16;
         } PACKED;
 
         struct EXT_SLV_SENS_DATA {
@@ -206,8 +198,7 @@ namespace ICM20948 {
         } PACKED;
 
         struct FIFO_COUNT {
-            std::uint8_t fifo_cnt_h : 8;
-            std::uint8_t fifo_cnt_l : 8;
+            std::uint16_t fifo_cnt : 16;
         } PACKED;
 
         struct FIFO_R_W {
@@ -254,20 +245,17 @@ namespace ICM20948 {
         } PACKED;
 
         struct XA_OFFS {
-            std::uint8_t xa_offs_h : 8;
-            std::uint8_t xa_offs_l : 7;
+            std::uint16_t xa_offs : 15;
             std::uint8_t : 1;
         } PACKED;
 
         struct YA_OFFS {
-            std::uint8_t ya_offs_h : 8;
-            std::uint8_t ya_offs_l : 7;
+            std::uint8_t ya_offs : 15;
             std::uint8_t : 1;
         } PACKED;
 
         struct ZA_OFFS {
-            std::uint8_t za_offs_h : 8;
-            std::uint8_t za_offs_l : 7;
+            std::uint8_t za_offs : 15;
             std::uint8_t : 1;
         } PACKED;
 
@@ -299,18 +287,15 @@ namespace ICM20948 {
         } PACKED;
 
         struct XG_OFFS_USR {
-            std::uint8_t xg_offs_usr_h : 8;
-            std::uint8_t xg_offs_usr_l : 8;
+            std::uint16_t xg_offs_usr : 16;
         } PACKED;
 
         struct YG_OFFS_USR {
-            std::uint8_t yg_offs_usr_h : 8;
-            std::uint8_t yg_offs_usr_l : 8;
+            std::uint16_t yg_offs_usr : 16;
         } PACKED;
 
         struct ZG_OFFS_USR {
-            std::uint8_t zg_offs_usr_h : 8;
-            std::uint8_t zg_offs_usr_l : 8;
+            std::uint16_t zg_offs_usr : 16;
         } PACKED;
 
         struct ODR_ALIGN_EN {
