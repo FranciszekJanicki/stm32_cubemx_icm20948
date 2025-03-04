@@ -131,6 +131,9 @@ namespace ICM20948 {
 
         struct Config {
             XA_OFFS xa_offs{};
+            YA_OFFS ya_offs{};
+            ZA_OFFS za_offs{};
+            TIMEBASE_CORRECTION_PLL timebase_correction_pll{};
         };
 
     }; // namespace Bank1
@@ -163,9 +166,18 @@ namespace ICM20948 {
             GYRO_SMPLRT_DIV gyro_smplrt_div{};
             GYRO_CONFIG_1 gyro_config_1{};
             GYRO_CONFIG_2 gyro_config_2{};
+            XG_OFFS_USR xg_offs_usr{};
+            YG_OFFS_USR yg_offs_usr{};
+            ZG_OFFS_USR zg_offs_usr{};
+            ODR_ALIGN_EN odr_align_en{};
             ACCEL_SMPLRT_DIV accel_smplrt_div{};
+            ACCEL_INTEL_CTRL accel_intel_ctrl{};
+            ACCEL_WOM_THR accel_wom_thr{};
             ACCEL_CONFIG_1 accel_config_1{};
             ACCEL_CONFIG_2 accel_config_2{};
+            FSYNC_CONFIG fsync_config{};
+            TEMP_CONFIG temp_config{};
+            MOD_CTRL_USR mod_ctrl_usr{};
         };
 
     }; // namespace Bank2
@@ -199,7 +211,11 @@ namespace ICM20948 {
             I2C_SLV4_DI = 0x17,
         };
 
-        struct Config {};
+        struct Config {
+            I2C_MST_ODR_CONFIG i2c_mst_odr_config{};
+            I2C_MST_CTRL i2c_mst_ctrl{};
+            I2C_MST_DELAY_CTRL i2c_mst_delay_ctrl{};
+        };
 
     }; // namespace Bank3
 

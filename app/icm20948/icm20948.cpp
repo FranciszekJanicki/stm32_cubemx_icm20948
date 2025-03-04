@@ -154,8 +154,8 @@ namespace ICM20948 {
 
     void ICM20948::initialize_bank(Bank0::Config const& config) const noexcept
     {
-        // this->set_user_ctrl_register(config.user_ctrl);
-        // this->set_lp_config_register(config.lp_config);
+        this->set_user_ctrl_register(config.user_ctrl);
+        this->set_lp_config_register(config.lp_config);
         this->set_pwr_mgmt_1_register(config.pwr_mgmt_1);
         this->set_pwr_mgmt_2_register(config.pwr_mgmt_2);
         this->set_int_pin_cfg_register(config.int_pin_cfg);
@@ -163,22 +163,45 @@ namespace ICM20948 {
         this->set_int_enable_1_register(config.int_enable_1);
         this->set_int_enable_2_register(config.int_enable_2);
         this->set_int_enable_3_register(config.int_enable_3);
+        this->set_fifo_en_1_register(config.fifo_en_1);
+        this->set_fifo_en_2_register(config.fifo_en_2);
+        this->set_fifo_mode_register(config.fifo_mode);
+        this->set_fifo_cfg_register(config.fifo_cfg);
     }
 
     void ICM20948::initialize_bank(Bank1::Config const& config) const noexcept
-    {}
+    {
+        this->set_xa_offs_registers(config.xa_offs);
+        this->set_ya_offs_registers(config.ya_offs);
+        this->set_za_offs_registers(config.za_offs);
+        this->set_timebase_correction_pll(config.timebase_correction_pll);
+    }
 
     void ICM20948::initialize_bank(Bank2::Config const& config) const noexcept
     {
         this->set_gyro_smplrt_div_register(config.gyro_smplrt_div);
         this->set_gyro_config_1_register(config.gyro_config_1);
+        this->set_gyro_config_2_register(config.gyro_config_2);
+        this->set_xg_offs_usr_registers(config.xg_offs_usr);
+        this->set_yg_offs_usr_registers(config.yg_offs_usr);
+        this->set_zg_offs_usr_registers(config.zg_offs_usr);
+        this->set_odr_align_en_register(config.odr_align_en);
         this->set_accel_smplrt_div_registers(config.accel_smplrt_div);
+        this->set_accel_intel_ctrl_register(config.accel_intel_ctrl);
+        this->set_accel_wom_thr_register(config.accel_wom_thr);
         this->set_accel_config_1_register(config.accel_config_1);
         this->set_accel_config_2_register(config.accel_config_2);
+        this->set_fsync_config_register(config.fsync_config);
+        this->set_temp_config_register(config.temp_config);
+        this->set_mod_ctrl_usr_register(config.mod_ctrl_usr);
     }
 
     void ICM20948::initialize_bank(Bank3::Config const& config) const noexcept
-    {}
+    {
+        this->set_i2c_mst_odr_config_register(config.i2c_mst_odr_config);
+        this->set_i2c_mst_ctrl_register(config.i2c_mst_ctrl);
+        this->set_i2c_mst_delay_ctrl_register(config.i2c_mst_delay_ctrl);
+    }
 
     std::uint8_t ICM20948::get_device_id() const noexcept
     {

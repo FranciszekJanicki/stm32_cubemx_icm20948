@@ -56,7 +56,7 @@ int main()
                                  .temp_dis = false,
                                  .clksel = std::to_underlying(ClockSource::AUTO_SELECT)};
 
-    auto pwr_mgmt_2 = PWR_MGMT_2{.disable_accel = 0b000, .disable_gyro = 0b000};
+    // auto pwr_mgmt_2 = PWR_MGMT_2{.disable_accel = 0b000, .disable_gyro = 0b000};
 
     auto int_pin_cfg = INT_PIN_CFG{.int1_actl = std::to_underlying(IntMode::ACTIVEHIGH),
                                    .int1_open = std::to_underlying(IntDrive::PUSHPULL),
@@ -84,10 +84,10 @@ int main()
                                        .gyro_fs_sel = std::to_underlying(GyroRange::GYRO_FS_250),
                                        .gyro_fchoice = false};
 
-    auto gyro_config_2 = GYRO_CONFIG_2{.xgyro_cten = false,
-                                       .ygyro_cten = false,
-                                       .zgyro_cten = false,
-                                       .gyro_avgcfg = std::to_underlying(GyroFIR::BW_774)};
+    // auto gyro_config_2 = GYRO_CONFIG_2{.xgyro_cten = false,
+    //                                    .ygyro_cten = false,
+    //                                    .zgyro_cten = false,
+    //                                    .gyro_avgcfg = std::to_underlying(GyroFIR::BW_774)};
 
     auto accel_smplrt_div =
         ACCEL_SMPLRT_DIV{.accel_smplrt_div = sampling_rate_to_accel_smplrt_div(ACCEL_SAMPLING_RATE_HZ)};
@@ -96,27 +96,29 @@ int main()
                                          .accel_fs_sel = std::to_underlying(AccelRange::ACCEL_FS_2),
                                          .accel_fchoice = false};
 
-    auto accel_config_2 = ACCEL_CONFIG_2{.ax_st_en_reg = false,
-                                         .ay_st_en_reg = false,
-                                         .az_st_en_reg = false,
-                                         .dec3_cfg = std::to_underlying(AccelFIR::BW_1238)};
+    // auto accel_config_2 = ACCEL_CONFIG_2{.ax_st_en_reg = false,
+    //                                      .ay_st_en_reg = false,
+    //                                      .az_st_en_reg = false,
+    //                                      .dec3_cfg = std::to_underlying(AccelFIR::BW_1238)};
 
     auto icm20948 = ICM20948::ICM20948{std::move(i2c_device),
                                        Bank0::Config{.user_ctrl = user_ctrl,
                                                      .lp_config = lp_config,
                                                      .pwr_mgmt_1 = pwr_mgmt_1,
-                                                     .pwr_mgmt_2 = pwr_mgmt_2,
+                                                     //.pwr_mgmt_2 = pwr_mgmt_2,
                                                      .int_enable = int_enable,
                                                      .int_enable_1 = int_enable_1,
                                                      .int_enable_2 = int_enable_2,
                                                      .int_enable_3 = int_enable_3},
                                        Bank1::Config{},
-                                       Bank2::Config{.gyro_smplrt_div = gyro_smplrt_div,
-                                                     .gyro_config_1 = gyro_config_1,
-                                                     .gyro_config_2 = gyro_config_2,
-                                                     .accel_smplrt_div = accel_smplrt_div,
-                                                     .accel_config_1 = accel_config_1,
-                                                     .accel_config_2 = accel_config_2},
+                                       Bank2::Config{
+                                           .gyro_smplrt_div = gyro_smplrt_div,
+                                           .gyro_config_1 = gyro_config_1,
+                                           // .gyro_config_2 = gyro_config_2,
+                                           .accel_smplrt_div = accel_smplrt_div,
+                                           .accel_config_1 = accel_config_1,
+                                           //.accel_config_2 = accel_config_2
+                                       },
                                        Bank3::Config{}};
 
     while (true) {
