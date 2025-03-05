@@ -304,6 +304,16 @@ namespace ICM20948 {
         BW_69 = 0x03,
     };
 
+    enum struct TempDLPF : std::uint8_t {
+        BW_7392 = 0x00,
+        BW_218 = 0x01,
+        BW_126 = 0x02,
+        BW_66 = 0x03,
+        BW_34 = 0x04,
+        BW_17 = 0x05,
+        BW_9 = 0x06,
+    };
+
     enum struct ExtSync : std::uint8_t {
         DISABLED = 0x0,
         TEMP_OUT_L = 0x1,
@@ -396,19 +406,19 @@ namespace ICM20948 {
 
     }; // namespace
 
-    inline std::uint16_t sampling_rate_to_gyro_smplrt_div(std::uint32_t const sampling_rate,
-                                                          bool const dlpf_enabled = false) noexcept
+    inline std::uint16_t gyro_output_rate_to_smplrt_div(std::uint32_t const output_rate,
+                                                        bool const dlpf_enabled = false) noexcept
     {
         return static_cast<std::uint16_t>((dlpf_enabled ? GYRO_OUTPUT_RATE_DLPF_EN_HZ : GYRO_OUTPUT_RATE_DLPF_DIS_HZ) /
-                                          sampling_rate) -
+                                          output_rate) -
                1U;
     }
 
-    inline std::uint16_t sampling_rate_to_accel_smplrt_div(std::uint32_t const sampling_rate,
-                                                           bool const dlpf_enabled = false) noexcept
+    inline std::uint16_t accel_output_rate_to_smplrt_div(std::uint32_t const output_rate,
+                                                         bool const dlpf_enabled = false) noexcept
     {
         return static_cast<std::uint16_t>(
-                   (dlpf_enabled ? ACCEL_OUTPUT_RATE_DLPF_EN_HZ : ACCEL_OUTPUT_RATE_DLPF_DIS_HZ) / sampling_rate) -
+                   (dlpf_enabled ? ACCEL_OUTPUT_RATE_DLPF_EN_HZ : ACCEL_OUTPUT_RATE_DLPF_DIS_HZ) / output_rate) -
                1U;
     }
 

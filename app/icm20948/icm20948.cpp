@@ -135,6 +135,7 @@ namespace ICM20948 {
                               Bank3::Config const& bank3_config) noexcept
     {
         if (this->is_valid_device_id()) {
+            this->device_reset();
             this->device_wake_up();
             this->initialize_bank(bank0_config);
             this->initialize_bank(bank1_config);
@@ -217,10 +218,8 @@ namespace ICM20948 {
 
     void ICM20948::device_wake_up() const noexcept
     {
-        auto pwr_mgmt_1 = this->get_pwr_mgmt_1_register();
-        pwr_mgmt_1.sleep = false;
-        this->set_pwr_mgmt_1_register(pwr_mgmt_1);
-        HAL_Delay(200UL);
+        this->set_pwr_mgmt_1_register(std::bit_cast<PWR_MGMT_1>(static_cast<std::uint8_t>(0)));
+        HAL_Delay(500UL);
     }
 
     void ICM20948::device_reset() const noexcept
@@ -228,7 +227,7 @@ namespace ICM20948 {
         auto pwr_mgmt_1 = this->get_pwr_mgmt_1_register();
         pwr_mgmt_1.device_reset = true;
         this->set_pwr_mgmt_1_register(pwr_mgmt_1);
-        HAL_Delay(200UL);
+        HAL_Delay(500UL);
     }
 
     std::optional<std::int16_t> ICM20948::get_acceleration_x_raw() const noexcept
