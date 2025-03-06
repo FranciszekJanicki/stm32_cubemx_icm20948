@@ -206,9 +206,7 @@ namespace ICM20948 {
 
     std::uint8_t ICM20948::get_device_id() const noexcept
     {
-        auto device_id = std::bit_cast<std::uint8_t>(this->get_who_am_i_register());
-        printf("device id: %d\n\r", device_id);
-        return device_id;
+        return std::bit_cast<std::uint8_t>(this->get_who_am_i_register());
     }
 
     bool ICM20948::is_valid_device_id() const noexcept

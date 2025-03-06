@@ -1,22 +1,20 @@
-add_executable(app)
+add_library(icm_20948_sensor STATIC)
 
-target_sources(app PRIVATE 
-    "main2.cpp"
+target_sources(icm_20948_sensor PRIVATE 
+  "ICM_20948_C.c"
+  "icm_sensor.c"
 )
 
-target_include_directories(app PRIVATE 
-    "." 
+target_include_directories(icm_20948_sensor PUBLIC 
+    "."
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(app PRIVATE
+target_link_libraries(icm_20948_sensor PRIVATE
     stm32cubemx
-   # icm20948
-   # ak09916
-    utility
-    icm_20948_sensor
 )
 
-target_compile_options(app PUBLIC
+target_compile_options(icm_20948_sensor PUBLIC
     -std=c++23
     -Wall
     -Wextra

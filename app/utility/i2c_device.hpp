@@ -53,6 +53,8 @@ namespace Utility {
 
         template <std::size_t SIZE>
         std::array<std::uint8_t, SIZE> read_bytes(std::uint8_t const reg_address) const noexcept;
+        void
+        read_bytes(std::uint8_t const reg_address, std::uint8_t* const data, std::size_t const size) const noexcept;
         std::uint8_t read_byte(std::uint8_t const reg_address) const noexcept;
 
         template <std::size_t SIZE>
@@ -65,6 +67,8 @@ namespace Utility {
 
         template <std::size_t SIZE>
         void write_bytes(std::uint8_t const reg_address, std::array<std::uint8_t, SIZE> const& bytes) const noexcept;
+        void
+        write_bytes(std::uint8_t const reg_address, std::uint8_t* const data, std::size_t const size) const noexcept;
         void write_byte(std::uint8_t const reg_address, std::uint8_t const byte) const noexcept;
 
         std::uint16_t dev_address() const noexcept;

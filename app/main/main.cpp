@@ -21,7 +21,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     if (GPIO_Pin == ICM_INT_Pin) {
         interrupt = true;
     }
-    //  std::puts("callback\n\r");
 }
 
 int main()
@@ -39,7 +38,7 @@ int main()
     auto constexpr GYRO_SAMPLING_RATE_HZ = 225UL;
     auto constexpr ACCEL_SAMPLING_RATE_HZ = 225UL;
 
-    auto i2c_device = I2CDevice{&hi2c1, std::to_underlying(DevAddress::AD0_LOW)};
+    auto i2c_device = I2CDevice{&hi2c1, std::to_underlying(DevAddress::AD0_HIGH)};
 
     auto user_ctrl = USER_CTRL{.dmp_en = false,
                                .fifo_en = false,
@@ -49,7 +48,7 @@ int main()
                                .sram_rst = false,
                                .i2c_mst_rst = false};
 
-    auto lp_config = LP_CONFIG{.i2c_mst_cycle = false, .accel_cycle = false, .gyro_cycle = false};
+    auto lp_config = LP_CONFIG{.i2c_mst_cycle = false, .accel_cycle = true, .gyro_cycle = true};
 
     auto pwr_mgmt_1 = PWR_MGMT_1{.device_reset = false,
                                  .sleep = false,
@@ -62,7 +61,7 @@ int main()
     auto int_pin_cfg = INT_PIN_CFG{.int1_actl = std::to_underlying(IntMode::ACTIVEHIGH),
                                    .int1_open = std::to_underlying(IntDrive::PUSHPULL),
                                    .int1_latch_en = std::to_underlying(IntLatch::PULSE50US),
-                                   .int_anyrd_2clear = std::to_underlying(IntClear::ANYREAD),
+                                   .int_anyrd_2clear = std::to_underlying(IntClear::STATUSREAD),
                                    .actl_fsync = false,
                                    .fsync_int_mode_en = false,
                                    .bypass_en = false};
@@ -118,9 +117,10 @@ int main()
                                       .za_offs = za_offs,
                                       .timebase_correction_pll = timebase_correction_pll};
 
-    auto gyro_smplrt_div = GYRO_SMPLRT_DIV{.gyro_smplrt_div = gyro_output_rate_to_smplrt_div(GYRO_SAMPLING_RATE_HZ)};
+    auto gyro_smplrt_div =
+        GYRO_SMPLRT_DIV{.gyro_smplrt_div = 1U}; // gyro_output_rate_to_smplrt_div(GYRO_SAMPLING_RATE_HZ)};
 
-    auto gyro_config_1 = GYRO_CONFIG_1{.gyro_dplfcfg = std::to_underlying(GyroDLPF::BW_361),
+    auto gyro_config_1 = GYRO_CONFIG_1{.gyro_dplfcfg = std::to_underlying(GyroDLPF::BW_197),
                                        .gyro_fs_sel = std::to_underlying(GyroRange::GYRO_FS_250),
                                        .gyro_fchoice = false};
 
@@ -138,13 +138,13 @@ int main()
     auto odr_align_en = ODR_ALIGN_EN{.odr_align_en = false};
 
     auto accel_smplrt_div =
-        ACCEL_SMPLRT_DIV{.accel_smplrt_div = accel_output_rate_to_smplrt_div(ACCEL_SAMPLING_RATE_HZ)};
+        ACCEL_SMPLRT_DIV{.accel_smplrt_div = 1U}; // accel_output_rate_to_smplrt_div(ACCEL_SAMPLING_RATE_HZ)};
 
     auto accel_intel_ctrl = ACCEL_INTEL_CTRL{.accel_intel_en = false, .accel_intel_mode_int = 0U};
 
     auto accel_wom_thr = ACCEL_WOM_THR{.wom_threshold = 0U};
 
-    auto accel_config_1 = ACCEL_CONFIG_1{.accel_dlpfcfg = std::to_underlying(AccelDLPF::BW_499),
+    auto accel_config_1 = ACCEL_CONFIG_1{.accel_dlpfcfg = std::to_underlying(AccelDLPF::BW_265),
                                          .accel_fs_sel = std::to_underlying(AccelRange::ACCEL_FS_2),
                                          .accel_fchoice = false};
 
@@ -195,11 +195,17 @@ int main()
 
     while (true) {
         if (interrupt) {
-            auto const& [ax, ay, az] = icm20948.get_acceleration_scaled().value();
-            std::printf("ax: %f, ay: %f, az: %f\n\r", ax, ay, az);
+            //     auto const& [ax, ay, az] = icm20948.get_acceleration_raw().value();
+            //     std::printf("ax: %f, ay: %f, az: %f\n\r", ax, ay, az);
 
-            auto const& [gx, gy, gz] = icm20948.get_rotation_scaled().value();
-            std::printf("gx: %f, gy: %f, gz: %f\n\r", gx, gy, gz);
+            //     auto const& [gx, gy, gz] = icm20948.get_rotation_raw().value();
+            //     std::printf("gx: %f, gy: %f, gz: %f\n\r", gx, gy, gz);
+
+            auto const ax = icm20948.get_acceleration_x_raw().value();
+            std::printf("ax: %f\n\r", ax);
+
+            auto const gx = icm20948.get_rotation_x_raw().value();
+            std::printf("gx: %f\n\r", gx);
 
             interrupt = false;
         }
