@@ -1,7 +1,7 @@
 add_executable(app)
 
 target_sources(app PRIVATE 
-    "main2.cpp"
+    "main.cpp"
 )
 
 target_include_directories(app PRIVATE 
@@ -10,10 +10,9 @@ target_include_directories(app PRIVATE
 
 target_link_libraries(app PRIVATE
     stm32cubemx
-   # icm20948
-   # ak09916
+    icm20948
+    ak09916
     utility
-    icm_20948_sensor
 )
 
 target_compile_options(app PUBLIC

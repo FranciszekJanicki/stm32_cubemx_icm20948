@@ -25,7 +25,6 @@ add_subdirectory(app/main)
 add_subdirectory(app/ak09916)
 add_subdirectory(app/icm20948)
 add_subdirectory(app/utility)
-add_subdirectory(app/icm_20948_sensor)
 
 target_compile_options(stm32cubemx INTERFACE 
     -w

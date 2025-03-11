@@ -195,17 +195,11 @@ int main()
 
     while (true) {
         if (interrupt) {
-            //     auto const& [ax, ay, az] = icm20948.get_acceleration_raw().value();
-            //     std::printf("ax: %f, ay: %f, az: %f\n\r", ax, ay, az);
+            auto const& [ax, ay, az] = icm20948.get_acceleration_raw().value();
+            std::printf("ax: %f, ay: %f, az: %f\n\r", ax, ay, az);
 
-            //     auto const& [gx, gy, gz] = icm20948.get_rotation_raw().value();
-            //     std::printf("gx: %f, gy: %f, gz: %f\n\r", gx, gy, gz);
-
-            auto const ax = icm20948.get_acceleration_x_raw().value();
-            std::printf("ax: %f\n\r", ax);
-
-            auto const gx = icm20948.get_rotation_x_raw().value();
-            std::printf("gx: %f\n\r", gx);
+            auto const& [gx, gy, gz] = icm20948.get_rotation_raw().value();
+            std::printf("gx: %f, gy: %f, gz: %f\n\r", gx, gy, gz);
 
             interrupt = false;
         }
