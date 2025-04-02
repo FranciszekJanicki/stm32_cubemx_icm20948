@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 include("cmake/gcc-arm-none-eabi.cmake")
 
-project(stm32-cubemx-icm20948 LANGUAGES C CXX ASM)
+project(stm32_cubemx_icm20948 LANGUAGES C CXX ASM)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -25,6 +25,7 @@ add_subdirectory(app/main)
 add_subdirectory(app/ak09916)
 add_subdirectory(app/icm20948)
 add_subdirectory(app/utility)
+add_subdirectory(app/stm32_utility)
 
 target_compile_options(stm32cubemx INTERFACE 
     -w

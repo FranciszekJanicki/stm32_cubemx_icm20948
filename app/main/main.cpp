@@ -13,15 +13,25 @@
 
 namespace {
 
-    volatile auto interrupt = false;
-}
+    inline auto volatile gpio_pin5_exti = false;
+
+}; // namespace
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == ICM_INT_Pin) {
-        interrupt = true;
+    if (GPIO_Pin == GPIO_PIN_5) {
+        std::puts("GPIO EXTI 5 CALLBACK");
+        gpio_pin5_exti = true;
     }
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 int main()
 {
@@ -194,14 +204,14 @@ int main()
     auto icm20948 = ICM20948::ICM20948{std::move(i2c_device), bank0_config, bank1_config, bank2_config, bank3_config};
 
     while (true) {
-        if (interrupt) {
+        if (gpio_pin5_exti) {
             auto const& [ax, ay, az] = icm20948.get_acceleration_raw().value();
             std::printf("ax: %f, ay: %f, az: %f\n\r", ax, ay, az);
 
             auto const& [gx, gy, gz] = icm20948.get_rotation_raw().value();
             std::printf("gx: %f, gy: %f, gz: %f\n\r", gx, gy, gz);
 
-            interrupt = false;
+            gpio_pin5_exti = false;
         }
     }
 

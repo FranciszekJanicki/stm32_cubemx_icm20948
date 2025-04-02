@@ -11,8 +11,6 @@ namespace AK09916 {
 
     struct AK09916 {
     public:
-        using I2CDevice = Utility::I2CDevice;
-
         AK09916() noexcept = default;
 
         AK09916(I2CDevice&& i2c_device, Config const& config) noexcept;

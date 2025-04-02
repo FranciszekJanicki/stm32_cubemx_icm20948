@@ -14,6 +14,8 @@ namespace ICM20948 {
     template <typename T>
     using Quat3D = Utility::Quaternion3D<T>;
 
+    using I2CDevice = STM32_Utility::I2CDevice;
+
     enum struct DevAddress : std::uint8_t {
         AD0_LOW = 0b1101000,
         AD0_HIGH = 0b1101001,

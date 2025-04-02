@@ -1,6 +1,7 @@
 #ifndef AK09916_CONFIG_HPP
 #define AK09916_CONFIG_HPP
 
+#include "i2c_device.hpp"
 #include "vector3d.hpp"
 #include <cstdint>
 
@@ -8,6 +9,8 @@ namespace AK09916 {
 
     template <typename T>
     using Vec3D = Utility::Vector3D<T>;
+
+    using I2CDevice = STM32_Utility::I2CDevice;
 
     enum struct RA : std::uint8_t {
         WHO_AM_I_1 = 0x00,

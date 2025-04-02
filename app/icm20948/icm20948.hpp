@@ -18,8 +18,6 @@ namespace ICM20948 {
 
     struct ICM20948 {
     public:
-        using I2CDevice = Utility::I2CDevice;
-
         ICM20948() noexcept = default;
 
         ICM20948(I2CDevice&& i2c_device,

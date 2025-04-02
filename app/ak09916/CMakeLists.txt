@@ -5,13 +5,14 @@ target_sources(ak09916 PRIVATE
 )
 
 target_include_directories(ak09916 PUBLIC 
-    "."
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/app/utility
+    ${CMAKE_SOURCE_DIR}/app/stm32_utility
 )
 
 
 target_link_libraries(ak09916 PRIVATE
     utility
+    stm32_utility
     stm32cubemx
 )
 
