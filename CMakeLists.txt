@@ -22,7 +22,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 add_subdirectory(cmake/stm32cubemx)
 add_subdirectory(app/main)
-add_subdirectory(app/ak09916)
 add_subdirectory(app/icm20948)
 add_subdirectory(app/utility)
 add_subdirectory(app/stm32_utility)

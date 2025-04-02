@@ -1,22 +1,18 @@
 add_library(icm20948 STATIC)
 
 target_sources(icm20948 PRIVATE 
-    "icm20948.cpp"
-    "icm20948_dmp.cpp"
-    "icm20948_mag.cpp"
+  "ICM_20948_C.c"
+  "icm20948.cpp"
 )
 
 target_include_directories(icm20948 PUBLIC 
-    ${CMAKE_SOURCE_DIR}/app/utility
     ${CMAKE_SOURCE_DIR}/app/stm32_utility
-    ${CMAKE_SOURCE_DIR}/app/ak09916
+    ${CMAKE_SOURCE_DIR}/app/utility
 )
 
 target_link_libraries(icm20948 PRIVATE
-    utility
-    stm32cubemx
-    ak09916
     stm32_utility
+    utility
 )
 
 target_compile_options(icm20948 PUBLIC

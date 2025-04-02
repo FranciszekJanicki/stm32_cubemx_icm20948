@@ -1,21 +1,20 @@
-add_executable(app)
+add_executable(main)
 
-target_sources(app PRIVATE 
+target_sources(main PRIVATE 
     "main.cpp"
 )
 
-target_include_directories(app PRIVATE 
+target_include_directories(main PRIVATE 
     ${CMAKE_SOURCE_DIR}/app/icm20948
 )
 
-target_link_libraries(app PRIVATE
+target_link_libraries(main PRIVATE
     stm32cubemx
     icm20948
-    ak09916
     utility
 )
 
-target_compile_options(app PUBLIC
+target_compile_options(main PUBLIC
     -std=c++23
     -Wall
     -Wextra

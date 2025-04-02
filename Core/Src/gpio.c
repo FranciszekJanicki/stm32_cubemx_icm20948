@@ -52,7 +52,7 @@ void MX_GPIO_Init(void)
     /*Configure GPIO pin : ICM_INT_Pin */
     GPIO_InitStruct.Pin = ICM_INT_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
-    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(ICM_INT_GPIO_Port, &GPIO_InitStruct);
 
     /* EXTI interrupt init*/
