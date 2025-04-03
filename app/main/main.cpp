@@ -47,7 +47,7 @@ int main()
 
     while (1) {
         if (gpio_pin5_exti) {
-            auto const& [r, p, y] = icm20948.get_roll_pitch_yaw();
+            auto const& [r, p, y] = icm20948.get_roll_pitch_yaw().value();
             std::printf("roll: %f, pitch: %f, yaw: %f\n\r", r, p, y);
             gpio_pin5_exti = false;
         }

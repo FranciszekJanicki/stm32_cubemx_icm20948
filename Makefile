@@ -53,7 +53,7 @@ remove_utility:
 	git submodule deinit -f ${UTILITY_DIR}
 	git rm -rf ${UTILITY_DIR}
 	rm -rf ${UTILITY_DIR}
-	rm -rf .git/modules/app/utility
+	rm -rf .git/modules/app/stm32_utility
 
 .PHONY: all
 all:
